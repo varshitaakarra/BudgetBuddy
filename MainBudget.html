@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BudgetBuddy 🌸</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(
+          135deg,
+          #fdf2f8 0%,
+          #faf5ff 50%,
+          #eff6ff 100%
+        );
+        color: #0a0a0a;
+      }
+
+      /* ─── HEADER ─── */
+      header {
+        position: relative;
+        width: 100%;
+        height: 96px;
+        overflow: hidden;
+        flex-shrink: 0;
+        background: linear-gradient(
+          90deg,
+          #fda5d5 0%,
+          #dab2ff 50%,
+          #8ec5ff 100%
+        );
+        display: flex;
+        align-items: center;
+      }
+      .header-emojis {
+        position: absolute;
+        inset: 0;
+        opacity: 0.2;
+        pointer-events: none;
+        user-select: none;
+      }
+      .header-emojis span {
+        position: absolute;
+        color: white;
+      }
+      .header-inner {
+        position: relative;
+        z-index: 10;
+        max-width: 1152px;
+        margin: 0 auto;
+        padding: 0 24px;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .brand-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      .brand-text h1 {
+        color: white;
+        font-weight: 700;
+        font-size: 24px;
+        line-height: 32px;
+        letter-spacing: 0.02em;
+      }
+      .brand-text p {
+        color: #f3e8ff;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      .logout-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 8px 16px;
+        border-radius: 8px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .logout-btn:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* ─── MAIN ─── */
+      main {
+        max-width: 1152px;
+        margin: 0 auto;
+        padding: 32px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+      }
+
+      /* ─── CARD BASE ─── */
+      .card {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+      }
+
+      /* ─── MONTH NAV + ACTIONS ─── */
+      .month-nav-card {
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      @media (min-width: 640px) {
+        .month-nav-card {
+          flex-direction: row;
+          align-items: center;
+        }
+      }
+      .month-nav {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-shrink: 0;
+      }
+      .nav-btn {
+        width: 36px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        background: white;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .nav-btn:hover:not(:disabled) {
+        background: #f9fafb;
+      }
+      .nav-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .month-label {
+        font-size: 20px;
+        font-weight: 700;
+        color: #0a0a0a;
+        letter-spacing: -0.449px;
+        width: 112px;
+        text-align: center;
+        white-space: nowrap;
+      }
+      .action-btns {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .modal-root[hidden] {
+        display: none !important;
+      }
+      .modal-root:not([hidden]) {
+        position: fixed;
+        inset: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+      }
+      .modal-backdrop {
+        position: absolute;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.45);
+        cursor: pointer;
+      }
+      .modal-card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
+        background: #fff;
+        border-radius: 14px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 1.25rem 1.35rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        max-height: 90vh;
+        overflow: auto;
+      }
+      .modal-card h3 {
+        font-size: 1.05rem;
+        font-weight: 700;
+        color: #0a0a0a;
+        margin-bottom: 0.35rem;
+      }
+      .modal-hint {
+        font-size: 0.8125rem;
+        color: #4b5563;
+        line-height: 1.45;
+        margin-bottom: 1rem;
+      }
+      .modal-field {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin-bottom: 0.85rem;
+      }
+      .modal-field label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .modal-field input,
+      .modal-field select {
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        padding: 0.5rem 0.65rem;
+        font-size: 0.875rem;
+        font-family: inherit;
+      }
+      .modal-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: 1rem;
+      }
+      .modal-actions .btn-primary {
+        margin: 0;
+      }
+      .btn-primary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #030213;
+        color: white;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-primary:hover {
+        background: #1a1a2e;
+      }
+      .btn-secondary {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: white;
+        color: #0a0a0a;
+        font-size: 14px;
+        font-weight: 500;
+        padding: 10px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+      .btn-secondary:hover {
+        background: #f9fafb;
+      }
+
+      /* ─── STATS CARDS ─── */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+      @media (min-width: 640px) {
+        .stats-grid {
+          grid-template-columns: repeat(3, 1fr);
+        }
+      }
+      .stat-card {
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .stat-card-inner {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .stat-info {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+      .stat-label {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+      }
+      .stat-value {
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 32px;
+        letter-spacing: 0.07px;
+      }
+      .stat-sub {
+        font-size: 12px;
+        font-weight: 400;
+        line-height: 16px;
+      }
+      .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+      /* green */
+      .stat-green {
+        border: 0.556px solid #b9f8cf;
+        background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%);
+      }
+      .stat-green .stat-label {
+        color: #008236;
+      }
+      .stat-green .stat-value {
+        color: #00a63e;
+      }
+      .stat-green .stat-icon {
+        background: #b9f8cf;
+      }
+      /* pink */
+      .stat-pink {
+        border: 0.556px solid #fccee8;
+        background: linear-gradient(135deg, #fdf2f8 0%, #fff1f2 100%);
+      }
+      .stat-pink .stat-label {
+        color: #c6005c;
+      }
+      .stat-pink .stat-value {
+        color: #e60076;
+      }
+      .stat-pink .stat-sub {
+        color: #e60076;
+      }
+      .stat-pink .stat-icon {
+        background: #fccee8;
+      }
+      /* purple */
+      .stat-purple {
+        border: 0.556px solid #e9d4ff;
+        background: linear-gradient(135deg, #faf5ff 0%, #f5f3ff 100%);
+      }
+      .stat-purple .stat-label {
+        color: #8200db;
+      }
+      .stat-purple .stat-value {
+        color: #9810fa;
+      }
+      .stat-purple .stat-sub {
+        color: #9810fa;
+      }
+      .stat-purple .stat-icon {
+        background: #e9d4ff;
+      }
+
+      /* ─── BOTTOM GRID ─── */
+      .bottom-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+      }
+      @media (min-width: 1024px) {
+        .bottom-grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      /* ─── BUDGET BREAKDOWN ─── */
+      .breakdown-card {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        height: 100%;
+      }
+      .card-title {
+        font-size: 20px;
+        font-weight: 700;
+        line-height: 28px;
+        color: #0a0a0a;
+        letter-spacing: -0.449px;
+      }
+      .breakdown-sub {
+        font-size: 13px;
+        font-weight: 500;
+        color: #717182;
+        line-height: 18px;
+        letter-spacing: -0.12px;
+      }
+      .empty-notice {
+        border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        background: #f9fafb;
+        padding: 16px;
+      }
+      .empty-notice p {
+        font-size: 14px;
+        color: #4a5565;
+        line-height: 20px;
+      }
+      .pie-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        min-height: 280px;
+        padding: 8px 0;
+      }
+      .pie-wrap svg {
+        width: min(280px, 90vw);
+        height: auto;
+        max-width: 100%;
+        display: block;
+        filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.06));
+      }
+      .legend {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 16px;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .legend-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .legend-label {
+        font-size: 14px;
+        color: #717182;
+      }
+
+      /* ─── BUDGET CATEGORIES ─── */
+      .categories-card {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+        height: 100%;
+      }
+      .cat-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .cat-row {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .cat-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .cat-name-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .cat-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+      .cat-name {
+        font-size: 16px;
+        font-weight: 500;
+        line-height: 24px;
+        color: #0a0a0a;
+        letter-spacing: -0.312px;
+      }
+      .cat-left {
+        font-size: 14px;
+        font-weight: 400;
+        line-height: 20px;
+        color: #717182;
+        letter-spacing: -0.15px;
+      }
+      .progress-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .progress-track {
+        flex: 1;
+        height: 8px;
+        border-radius: 100px;
+        background: #e5e7eb;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        border-radius: 100px;
+        background: #2b7fff;
+        transition: width 0.5s ease;
+      }
+      .progress-text {
+        font-size: 14px;
+        color: #717182;
+        white-space: nowrap;
+        letter-spacing: -0.15px;
+      }
+
+      /* ─── PERSONALIZED MESSAGE ─── */
+      .message-card {
+        border-radius: 16px;
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        border: 0.556px solid #c6d2ff;
+        background: linear-gradient(90deg, #eef2ff 0%, #eff6ff 100%);
+      }
+      .message-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #312c85;
+        letter-spacing: -0.439px;
+      }
+      .message-card p {
+        font-size: 14px;
+        color: #372aac;
+        line-height: 20px;
+        letter-spacing: -0.15px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ═══ HEADER ═══ -->
+    <header>
+      <div class="header-emojis">
+        <span style="right: 94px; top: 8px; font-size: 36px">🌸</span>
+        <span style="right: 174px; top: 32px; font-size: 28px">🌷</span>
+        <span style="left: 80px; top: 48px; font-size: 28px">🌼</span>
+        <span style="left: 160px; top: 20px; font-size: 24px">🦋</span>
+      </div>
+      <div class="header-inner">
+        <div class="brand">
+          <div class="brand-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M11.9966 1.99945V21.9937"
+                stroke="white"
+                stroke-width="1.99942"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M16.9951 4.99854H9.49728C8.56929 4.99854 7.67931 5.36718 7.02312 6.02337C6.36693 6.67955 5.99829 7.56953 5.99829 8.49752C5.99829 9.42551 6.36693 10.3155 7.02312 10.9717C7.67931 11.6279 8.56929 11.9965 9.49728 11.9965H14.4958C15.4238 11.9965 16.3138 12.3652 16.97 13.0213C17.6262 13.6775 17.9948 14.5675 17.9948 15.4955C17.9948 16.4235 17.6262 17.3135 16.97 17.9697C16.3138 18.6258 15.4238 18.9945 14.4958 18.9945H5.99829"
+                stroke="white"
+                stroke-width="1.99942"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>BudgetBuddy 🌸</h1>
+            <p>Bloom with your finances this spring</p>
+          </div>
+        </div>
+        <button
+          class="logout-btn"
+          onclick="window.location.href='LogInPage.html'"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path
+              d="M5.99932 13.9985H3.33294C2.97936 13.9985 2.64026 13.858 2.39024 13.608C2.14022 13.358 1.99976 13.0188 1.99976 12.6653V3.33294C1.99976 2.97936 2.14022 2.64026 2.39024 2.39024C2.64026 2.14022 2.97936 1.99976 3.33294 1.99976H5.99932"
+              stroke="white"
+              stroke-width="1.33319"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M10.6655 11.3321L13.9985 7.99911L10.6655 4.66614"
+              stroke="white"
+              stroke-width="1.33319"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M13.9984 7.99915H5.99927"
+              stroke="white"
+              stroke-width="1.33319"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Logout
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══ MAIN ═══ -->
+    <main>
+      <!-- Month Nav + Action Buttons -->
+      <div class="card month-nav-card">
+        <div class="month-nav">
+          <button class="nav-btn" id="prevBtn" onclick="changeMonth(-1)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M9.99896 11.9987L5.99939 7.99914L9.99896 3.99957"
+                stroke="#0A0A0A"
+                stroke-width="1.33319"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+          <span class="month-label" id="monthLabel"></span>
+          <button class="nav-btn" id="nextBtn" onclick="changeMonth(1)">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M5.99927 11.9987L9.99883 7.99914L5.99927 3.99957"
+                stroke="#0A0A0A"
+                stroke-width="1.33319"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </button>
+        </div>
+        <div class="action-btns">
+          <button
+            class="btn-primary"
+            onclick="window.location.href='UploadReceipt.html'"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path
+                d="M13.9985 9.9989V12.6653C13.9985 13.0189 13.858 13.358 13.608 13.608C13.358 13.858 13.0188 13.9985 12.6653 13.9985H3.33294C2.97936 13.9985 2.64026 13.858 2.39024 13.608C2.14022 13.358 1.99976 13.0189 1.99976 12.6653V9.9989"
+                stroke="white"
+                stroke-width="1.33319"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M11.3321 5.33273L7.99911 1.99976L4.66614 5.33273"
+                stroke="white"
+                stroke-width="1.33319"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M7.99915 1.99976V9.99889"
+                stroke="white"
+                stroke-width="1.33319"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            Upload Receipt
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="openManualAdjustmentModal()"
+          >
+            Enter manually
+          </button>
+          <button
+            type="button"
+            class="btn-secondary"
+            onclick="openIncomeSavingsModal()"
+          >
+            Income &amp; savings
+          </button>
+          <button
+            class="btn-secondary"
+            onclick="window.location.href='ReceiptsHistory.html'"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <g clip-path="url(#clip0)">
+                <path
+                  d="M2.66638 1.33319V14.6651L3.99957 13.9985L5.33276 14.6651L6.66595 13.9985L7.99914 14.6651L9.33233 13.9985L10.6655 14.6651L11.9987 13.9985L13.3319 14.6651V1.33319L11.9987 1.99979L10.6655 1.33319L9.33233 1.99979L7.99914 1.33319L6.66595 1.99979L5.33276 1.33319L3.99957 1.99979L2.66638 1.33319Z"
+                  stroke="#0A0A0A"
+                  stroke-width="1.33319"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M10.6655 5.33276H6.66595C6.31237 5.33276 5.97327 5.47322 5.72325 5.72325C5.47322 5.97327 5.33276 6.31237 5.33276 6.66595C5.33276 7.01954 5.47322 7.35864 5.72325 7.60866C5.97327 7.85868 6.31237 7.99914 6.66595 7.99914H9.33233C9.68591 7.99914 10.025 8.1396 10.275 8.38962C10.5251 8.63964 10.6655 8.97875 10.6655 9.33233C10.6655 9.68591 10.5251 10.025 10.275 10.275C10.025 10.5251 9.68591 10.6655 9.33233 10.6655H5.33276"
+                  stroke="#0A0A0A"
+                  stroke-width="1.33319"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M7.99915 11.6654V4.33289"
+                  stroke="#0A0A0A"
+                  stroke-width="1.33319"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </g>
+              <defs>
+                <clipPath id="clip0">
+                  <rect width="15.9983" height="15.9983" fill="white" />
+                </clipPath>
+              </defs>
+            </svg>
+            View Receipts
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+        <!-- Monthly Income -->
+        <div class="stat-card stat-green">
+          <div class="stat-card-inner">
+            <div class="stat-info">
+              <span class="stat-label">Monthly Income 🌿</span>
+              <span class="stat-value" id="incomeVal"></span>
+            </div>
+            <div class="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M21.9936 6.99792L13.4961 15.4955L8.49751 10.4969L1.99939 16.995"
+                  stroke="#008236"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M15.9954 6.99792H21.9936V12.9962"
+                  stroke="#008236"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remaining Budget -->
+        <div class="stat-card stat-pink">
+          <div class="stat-card-inner">
+            <div class="stat-info">
+              <span class="stat-label">Remaining Budget 🌸</span>
+              <span class="stat-value" id="remainingVal"></span>
+              <span class="stat-sub" id="spentPct"></span>
+            </div>
+            <div class="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M18.9945 6.99799V3.99886C18.9945 3.73372 18.8892 3.47944 18.7017 3.29195C18.5142 3.10447 18.2599 2.99915 17.9948 2.99915H4.99857C4.46829 2.99915 3.95973 3.2098 3.58476 3.58476C3.2098 3.95973 2.99915 4.46829 2.99915 4.99857C2.99915 5.52885 3.2098 6.03741 3.58476 6.41237C3.95973 6.78734 4.46829 6.99799 4.99857 6.99799H19.9942C20.2594 6.99799 20.5136 7.10332 20.7011 7.2908C20.8886 7.47828 20.9939 7.73256 20.9939 7.9977V11.9965M20.9939 11.9965H17.9948C17.4645 11.9965 16.956 12.2072 16.581 12.5822C16.206 12.9571 15.9954 13.4657 15.9954 13.996C15.9954 14.5262 16.206 15.0348 16.581 15.4098C16.956 15.7847 17.4645 15.9954 17.9948 15.9954H20.9939C21.2591 15.9954 21.5134 15.8901 21.7008 15.7026C21.8883 15.5151 21.9937 15.2608 21.9937 14.9957V12.9963C21.9937 12.7311 21.8883 12.4768 21.7008 12.2894C21.5134 12.1019 21.2591 11.9965 20.9939 11.9965Z"
+                  stroke="#E60076"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M2.99915 4.99854V18.9945C2.99915 19.5248 3.2098 20.0333 3.58476 20.4083C3.95973 20.7833 4.46829 20.9939 4.99857 20.9939H19.9942C20.2594 20.9939 20.5136 20.8886 20.7011 20.7011C20.8886 20.5136 20.9939 20.2593 20.9939 19.9942V15.9954"
+                  stroke="#E60076"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- Savings Goal -->
+        <div class="stat-card stat-purple">
+          <div class="stat-card-inner">
+            <div class="stat-info">
+              <span class="stat-label">Savings Goal 🌷</span>
+              <span class="stat-value" id="savingsVal"></span>
+              <span class="stat-sub">per month</span>
+            </div>
+            <div class="stat-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M18.9945 4.99854C17.4949 4.99854 16.1953 6.39813 15.9954 6.99796C12.4964 5.49839 4.99854 6.69804 4.99854 11.9965C4.99854 13.796 4.99854 14.9956 6.99796 16.4952V19.9942H10.9968V17.9948H13.9959V19.9942H17.9948V15.9954C18.9945 15.4955 19.6943 14.9956 19.9942 13.9959H21.9936V9.99709H19.9942C19.9942 8.99738 19.4943 8.49752 18.9945 7.99767V4.99854Z"
+                  stroke="#8200DB"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M1.99951 8.99744V9.99744C1.99951 11.0974 2.89951 11.9974 3.99951 11.9974H4.99951"
+                  stroke="#8200DB"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M15.9954 10.9968H16.0054"
+                  stroke="#8200DB"
+                  stroke-width="1.99942"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Grid: Breakdown + Categories -->
+      <div class="bottom-grid">
+        <!-- Budget Breakdown -->
+        <div class="card breakdown-card">
+          <h2 class="card-title">Budget Breakdown</h2>
+          <p class="breakdown-sub" id="breakdownSubtitle">
+            Your budget slices will appear here.
+          </p>
+          <div class="empty-notice" id="emptyNotice">
+            <p>
+              📊 No spending data yet. Start tracking your expenses to see your
+              budget breakdown!
+            </p>
+          </div>
+          <div class="pie-wrap">
+            <svg
+              id="pieChart"
+              width="260"
+              height="260"
+              viewBox="0 0 200 200"
+              fill="none"
+              role="img"
+              aria-label="Budget breakdown chart"
+            >
+              <!-- rendered by JS -->
+            </svg>
+          </div>
+          <div class="legend" id="legend" style="display: none"></div>
+        </div>
+
+        <!-- Budget Categories -->
+        <div class="card categories-card">
+          <h2 class="card-title">Your Budget Categories</h2>
+          <div class="cat-list" id="catList"></div>
+        </div>
+      </div>
+
+      <!-- Manual spending / adjustment -->
+      <div id="modal-manual" class="modal-root" hidden>
+        <div
+          class="modal-backdrop"
+          onclick="closeManualAdjustmentModal()"
+        ></div>
+        <div
+          class="modal-card"
+          role="dialog"
+          aria-labelledby="modal-manual-title"
+          onclick="event.stopPropagation()"
+        >
+          <h3 id="modal-manual-title">Enter manually</h3>
+          <p class="modal-hint">
+            Add spending without a receipt photo. Use a
+            <strong>negative</strong> amount to reduce a category (for example
+            you split a bill and friends paid you back: enter
+            <strong>-75</strong> on Food &amp; Dining). Applies to the month you
+            are viewing.
+          </p>
+          <div class="modal-field">
+            <label for="adj-amount">Amount ($)</label>
+            <input
+              id="adj-amount"
+              type="number"
+              step="0.01"
+              placeholder="e.g. 42.50 or -75"
+            />
+          </div>
+          <div class="modal-field">
+            <label for="adj-category">Category</label>
+            <select id="adj-category"></select>
+          </div>
+          <div class="modal-field">
+            <label for="adj-note">Description (optional)</label>
+            <input
+              id="adj-note"
+              type="text"
+              maxlength="120"
+              placeholder="e.g. Venmo from Alex — dinner split"
+            />
+          </div>
+          <div class="modal-field">
+            <label for="adj-date">Date (optional)</label>
+            <input
+              id="adj-date"
+              type="text"
+              placeholder="Defaults to today if empty"
+            />
+          </div>
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-primary"
+              onclick="submitManualAdjustment()"
+            >
+              Save to this month
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="closeManualAdjustmentModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Income & savings -->
+      <div id="modal-plan" class="modal-root" hidden>
+        <div class="modal-backdrop" onclick="closeIncomeSavingsModal()"></div>
+        <div
+          class="modal-card"
+          role="dialog"
+          aria-labelledby="modal-plan-title"
+          onclick="event.stopPropagation()"
+        >
+          <h3 id="modal-plan-title">Income &amp; savings</h3>
+          <p class="modal-hint">
+            These drive your planned budgets on the main screen. Rent still
+            comes from Budget Setup if you need to change it.
+          </p>
+          <div class="modal-field">
+            <label for="plan-income">Monthly income</label>
+            <input id="plan-income" type="number" min="0" step="1" />
+          </div>
+          <div class="modal-field">
+            <label for="plan-savings">Monthly savings goal</label>
+            <input id="plan-savings" type="number" min="0" step="1" />
+          </div>
+          <div class="modal-actions">
+            <button
+              type="button"
+              class="btn-primary"
+              onclick="submitIncomeSavings()"
+            >
+              Save
+            </button>
+            <button
+              type="button"
+              class="btn-secondary"
+              onclick="closeIncomeSavingsModal()"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personalized Message -->
+      <div class="message-card">
+        <h3>🎯 Your Personalized Budget is Ready!</h3>
+        <p>
+          We've allocated your budget to help you enjoy college life while
+          staying financially responsible. Your budget ensures you can spend on
+          food, entertainment, and the things you love without missing out or
+          overspending. Start uploading receipts to track your expenses!
+        </p>
+      </div>
+    </main>
+
+    <script>
+      const MONTHS = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+      ];
+      const RECEIPTS_STORAGE_KEY = "budgetbuddy.receipts";
+      const LEGACY_RECEIPTS_STORAGE_KEY = "receipts";
+
+      // categories include Housing and Savings explicitly
+      const CATEGORIES = [
+        { name: "Housing / Rent", color: "#FCA5A5", spent: 0, budget: 0 },
+        { name: "Food & Dining", color: "#86EFAC", spent: 0, budget: 0 },
+        { name: "Transportation", color: "#FDA4AF", spent: 0, budget: 0 },
+        { name: "Entertainment", color: "#FCD34D", spent: 0, budget: 0 },
+        { name: "Shopping", color: "#A78BFA", spent: 0, budget: 0 },
+        { name: "Clothing & Apparel", color: "#FB7185", spent: 0, budget: 0 },
+        { name: "Bills & Utilities", color: "#93C5FD", spent: 0, budget: 0 },
+        { name: "Other", color: "#FBCFE8", spent: 0, budget: 0 },
+        { name: "Savings", color: "#7DD3FC", spent: 0, budget: 0 },
+      ];
+
+      // runtime values (populated from localStorage / budgetData)
+      let MONTHLY_INCOME = 2000;
+      let RENT = 0;
+      let SAVINGS_GOAL = 0;
+      let TOTAL_BUDGET = 0; // spendable (income - rent - savings)
+
+      function normalizeCategory(category) {
+        if (!category) return "Other";
+        const match = CATEGORIES.find((c) => c.name === category);
+        return match ? match.name : "Other";
+      }
+
+      function getReceiptMonthDate(receipt) {
+        // Prefer upload timestamp so newly committed receipts affect current month dashboard immediately.
+        const candidates = [receipt?.uploadedAt, receipt?.receiptDate];
+        for (const value of candidates) {
+          if (!value) continue;
+          const d = new Date(value);
+          if (!Number.isNaN(d.getTime())) return d;
+        }
+        return null;
+      }
+
+      function readReceiptsFromStorage() {
+        const all = [];
+        const keys = [RECEIPTS_STORAGE_KEY, LEGACY_RECEIPTS_STORAGE_KEY];
+        for (const key of keys) {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          try {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) all.push(...parsed);
+          } catch (e) {
+            console.error(`Failed to parse receipts for key "${key}":`, e);
+          }
+        }
+        // Deduplicate receipts that may exist in both legacy/new keys.
+        const seen = new Set();
+        const deduped = [];
+        for (const receipt of all) {
+          const signature = [
+            receipt?.id ?? "",
+            receipt?.uploadedAt ?? "",
+            receipt?.receiptDate ?? "",
+            Number(receipt?.amount || 0).toFixed(2),
+            receipt?.merchant ?? "",
+            receipt?.fileName ?? "",
+          ].join("|");
+          if (seen.has(signature)) continue;
+          seen.add(signature);
+          deduped.push(receipt);
+        }
+        return deduped;
+      }
+
+      function resetCategorySpent() {
+        CATEGORIES.forEach((c) => {
+          c.spent = 0;
+        });
+      }
+
+      function loadReceiptSpending() {
+        resetCategorySpent();
+        const receipts = readReceiptsFromStorage();
+        if (!Array.isArray(receipts)) return;
+
+        for (const receipt of receipts) {
+          const receiptDate = getReceiptMonthDate(receipt);
+          if (!receiptDate) continue;
+          if (
+            receiptDate.getMonth() !== monthIndex ||
+            receiptDate.getFullYear() !== year
+          )
+            continue;
+
+          if (Array.isArray(receipt.splits) && receipt.splits.length > 0) {
+            for (const split of receipt.splits) {
+              const part = Number(split.amount);
+              if (!Number.isFinite(part) || part === 0) continue;
+              const categoryName = normalizeCategory(split.category);
+              const idx = CATEGORIES.findIndex((c) => c.name === categoryName);
+              if (idx >= 0) CATEGORIES[idx].spent += part;
+            }
+            continue;
+          }
+
+          const amount = Number(receipt?.amount);
+          if (!Number.isFinite(amount) || amount === 0) continue;
+
+          const categoryName = normalizeCategory(receipt?.category);
+          const idx = CATEGORIES.findIndex((c) => c.name === categoryName);
+          if (idx >= 0) CATEGORIES[idx].spent += amount;
+        }
+      }
+
+      // load saved setup (budgetData preferred)
+      function loadBudgetSetup() {
+        try {
+          const raw = localStorage.getItem("budgetData");
+          let data = null;
+          if (raw) {
+            data = JSON.parse(raw);
+          }
+
+          const storedIncome = data?.income ?? localStorage.getItem("income");
+          const storedRent = data?.rent ?? localStorage.getItem("rent");
+          const storedSavings =
+            data?.savings ?? localStorage.getItem("savings");
+
+          MONTHLY_INCOME = Number(storedIncome) || MONTHLY_INCOME;
+          RENT = Number(storedRent) || 0;
+
+          // if user entered a savings amount use it, otherwise default to 15% of income
+          if (storedSavings != null && String(storedSavings).trim() !== "") {
+            SAVINGS_GOAL = Number(storedSavings) || 0;
+          } else {
+            SAVINGS_GOAL = Math.round(MONTHLY_INCOME * 0.15);
+          }
+
+          // allocate budgets: leftover = income - rent - savingsGoal
+          const spendable = Math.max(0, MONTHLY_INCOME - RENT - SAVINGS_GOAL);
+
+          // weights (relative) for spendable categories: food 25, transport 25, entertainment 15, shopping 15, other 5
+          const weights = {
+            "Food & Dining": 24,
+            Transportation: 18,
+            Entertainment: 14,
+            Shopping: 12,
+            "Clothing & Apparel": 10,
+            "Bills & Utilities": 13,
+            Other: 9,
+          };
+          const weightSum = Object.values(weights).reduce((s, v) => s + v, 0);
+
+          // zero spendable budgets first
+          CATEGORIES.forEach((c) => {
+            c.budget = 0;
+          });
+
+          // set Housing budget from RENT (if provided)
+          const idxHousing = CATEGORIES.findIndex(
+            (c) => c.name === "Housing / Rent"
+          );
+          if (idxHousing >= 0) CATEGORIES[idxHousing].budget = Math.round(RENT);
+
+          // allocate spendable proportionally to the weights (normalized)
+          const spendableKeys = Object.keys(weights);
+          let assigned = 0;
+          for (let i = 0; i < spendableKeys.length; i++) {
+            const key = spendableKeys[i];
+            const idx = CATEGORIES.findIndex((c) => c.name === key);
+            if (idx < 0) continue;
+            // calculate float share, then round; fix rounding on last item
+            const val = Math.round(spendable * (weights[key] / weightSum));
+            CATEGORIES[idx].budget = val;
+            assigned += val;
+          }
+          // fix rounding diff
+          const diff = spendable - assigned;
+          if (diff !== 0) {
+            // add leftover to 'Other' if present, else last spendable category
+            const idxOther = CATEGORIES.findIndex((c) => c.name === "Other");
+            if (idxOther >= 0) CATEGORIES[idxOther].budget += diff;
+            else {
+              const lastIdx = CATEGORIES.map((c, i) => i)
+                .reverse()
+                .find((i) => CATEGORIES[i].budget !== 0);
+              if (lastIdx != null) CATEGORIES[lastIdx].budget += diff;
+            }
+          }
+
+          // set Savings category
+          const idxSav = CATEGORIES.findIndex((c) => c.name === "Savings");
+          if (idxSav >= 0) CATEGORIES[idxSav].budget = Math.round(SAVINGS_GOAL);
+
+          // TOTAL_BUDGET is the spendable amount (used for percent calculations & "Remaining")
+          TOTAL_BUDGET = spendable;
+        } catch (e) {
+          console.error("Failed to load budget setup:", e);
+        }
+      }
+
+      // load setup and allocate right away
+      loadBudgetSetup();
+
+      const now = new Date();
+      let year = now.getFullYear();
+      let monthIndex = now.getMonth();
+
+      const fmt = (n) =>
+        n.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
+      function round2(n) {
+        return Math.round(Number(n) * 100) / 100;
+      }
+
+      function parseUserDateInput(str) {
+        const s = String(str || "").trim();
+        if (!s) return null;
+        const d = new Date(s);
+        if (!Number.isNaN(d.getTime())) return d;
+        return null;
+      }
+
+      function anchorDateForViewedMonth() {
+        return new Date(year, monthIndex, 15, 12, 0, 0, 0);
+      }
+
+      function fillAdjustmentCategorySelect() {
+        const sel = document.getElementById("adj-category");
+        if (!sel) return;
+        sel.innerHTML = CATEGORIES.map((c) => {
+          const esc = (t) =>
+            String(t)
+              .replace(/&/g, "&amp;")
+              .replace(/</g, "&lt;")
+              .replace(/"/g, "&quot;");
+          return `<option value="${esc(c.name)}">${esc(c.name)}</option>`;
+        }).join("");
+      }
+
+      function openManualAdjustmentModal() {
+        fillAdjustmentCategorySelect();
+        document.getElementById("adj-amount").value = "";
+        document.getElementById("adj-note").value = "";
+        document.getElementById("adj-date").value = "";
+        document.getElementById("modal-manual").hidden = false;
+        document.getElementById("adj-amount").focus();
+      }
+
+      function closeManualAdjustmentModal() {
+        document.getElementById("modal-manual").hidden = true;
+      }
+
+      function openIncomeSavingsModal() {
+        document.getElementById("plan-income").value = String(
+          MONTHLY_INCOME || 0
+        );
+        document.getElementById("plan-savings").value = String(
+          SAVINGS_GOAL || 0
+        );
+        document.getElementById("modal-plan").hidden = false;
+      }
+
+      function closeIncomeSavingsModal() {
+        document.getElementById("modal-plan").hidden = true;
+      }
+
+      function submitIncomeSavings() {
+        const income = Number(document.getElementById("plan-income").value);
+        const savings = Number(document.getElementById("plan-savings").value);
+        if (!Number.isFinite(income) || income < 0) {
+          alert("Enter a valid monthly income (0 or more).");
+          return;
+        }
+        if (!Number.isFinite(savings) || savings < 0) {
+          alert("Enter a valid savings goal (0 or more).");
+          return;
+        }
+        if (income < RENT + savings) {
+          alert(
+            "Income should be at least rent plus savings. Adjust rent in Budget Setup if needed."
+          );
+          return;
+        }
+        let data = {};
+        try {
+          const raw = localStorage.getItem("budgetData");
+          if (raw) data = JSON.parse(raw);
+        } catch (_) {}
+        data.income = income;
+        data.savings = savings;
+        localStorage.setItem("budgetData", JSON.stringify(data));
+        localStorage.setItem("income", String(income));
+        localStorage.setItem("savings", String(savings));
+        loadBudgetSetup();
+        render();
+        closeIncomeSavingsModal();
+      }
+
+      function saveReceiptToStorage(entry) {
+        const receipts = JSON.parse(
+          localStorage.getItem(RECEIPTS_STORAGE_KEY) || "[]"
+        );
+        receipts.unshift(entry);
+        localStorage.setItem(RECEIPTS_STORAGE_KEY, JSON.stringify(receipts));
+      }
+
+      function submitManualAdjustment() {
+        const rawAmt = Number(
+          String(document.getElementById("adj-amount").value || "").trim()
+        );
+        const cat = document.getElementById("adj-category").value;
+        const note =
+          String(document.getElementById("adj-note").value || "").trim() ||
+          "Manual entry";
+        const dateStr = String(
+          document.getElementById("adj-date").value || ""
+        ).trim();
+
+        if (!Number.isFinite(rawAmt) || rawAmt === 0) {
+          alert(
+            "Enter a non-zero amount (positive to add spending, negative to subtract)."
+          );
+          return;
+        }
+
+        const amount = round2(rawAmt);
+        const when = parseUserDateInput(dateStr) || anchorDateForViewedMonth();
+        const iso = when.toISOString();
+
+        const splits = [{ category: normalizeCategory(cat), amount }];
+        const total = round2(splits.reduce((a, s) => a + s.amount, 0));
+
+        saveReceiptToStorage({
+          id: Date.now(),
+          fileName: "Manual entry",
+          uploadedAt: iso,
+          ocrText: "",
+          merchant: "Manual entry",
+          amount: total,
+          receiptDate: iso,
+          category: splits.length === 1 ? splits[0].category : "Mixed",
+          splits,
+          lineItems: [{ name: note.slice(0, 80), amount }],
+        });
+
+        closeManualAdjustmentModal();
+        render();
+      }
+
+      function isCurrentOrFuture() {
+        return (
+          year > now.getFullYear() ||
+          (year === now.getFullYear() && monthIndex >= now.getMonth())
+        );
+      }
+
+      function changeMonth(dir) {
+        if (dir === 1 && isCurrentOrFuture()) return;
+        monthIndex += dir;
+        if (monthIndex < 0) {
+          monthIndex = 11;
+          year--;
+        }
+        if (monthIndex > 11) {
+          monthIndex = 0;
+          year++;
+        }
+        render();
+      }
+
+      function render() {
+        loadReceiptSpending();
+        // ensure totals reflect current state
+        document.getElementById(
+          "monthLabel"
+        ).textContent = `${MONTHS[monthIndex]} ${year}`;
+        document.getElementById("nextBtn").disabled = isCurrentOrFuture();
+
+        // totalSpent excludes savings
+        const totalSpent = CATEGORIES.reduce(
+          (s, c) => (c.name === "Savings" ? s : s + c.spent),
+          0
+        );
+
+        // Remaining budget is the spendable budget minus recorded spending.
+        const remaining = Math.max(0, TOTAL_BUDGET - totalSpent);
+
+        const spentPct =
+          TOTAL_BUDGET > 0 ? Math.round((totalSpent / TOTAL_BUDGET) * 100) : 0;
+
+        document.getElementById("incomeVal").textContent = fmt(MONTHLY_INCOME);
+        document.getElementById("remainingVal").textContent = fmt(remaining);
+        document.getElementById(
+          "spentPct"
+        ).textContent = `${spentPct}% spent this month`;
+        document.getElementById("savingsVal").textContent = fmt(
+          CATEGORIES.find((c) => c.name === "Savings")?.budget || 0
+        );
+
+        renderPie(totalSpent);
+        renderCategories();
+      }
+
+      function pieArcDonutSlices(items, cx, cy, r, innerR) {
+        const total = items.reduce((s, row) => s + row.value, 0);
+        if (total <= 0 || !items.some((row) => row.value > 0)) {
+          return {
+            svgInner: `
+          <circle cx="${cx}" cy="${cy}" r="${r}" fill="#E5E7EB"/>
+          <circle cx="${cx}" cy="${cy}" r="${innerR}" fill="white"/>
+        `,
+            pctMap: [],
+          };
+        }
+        const TWO_PI = 2 * Math.PI;
+        const positiveRows = items.filter((row) => row.value > 0);
+        const midR = (r + innerR) / 2;
+        const strokeW = r - innerR;
+
+        /** SVG arc slices cannot draw a clean 360° ring (start meets end). Use a stroked circle instead. */
+        function fullRingStroke(color) {
+          return `<circle cx="${cx}" cy="${cy}" r="${midR}" fill="none" stroke="${color}" stroke-width="${strokeW}"/>`;
+        }
+
+        let angle = -Math.PI / 2;
+        let paths = "";
+        const pctMap = [];
+        for (const row of items) {
+          if (row.value <= 0) continue;
+          const slice = (row.value / total) * TWO_PI;
+          const pct = Math.round((row.value / total) * 100);
+          pctMap.push({ row, pct });
+
+          if (positiveRows.length === 1 || slice >= TWO_PI - 1e-3) {
+            paths += fullRingStroke(row.color);
+            break;
+          }
+
+          const endAngle = angle + slice;
+          const x1 = cx + r * Math.cos(angle),
+            y1 = cy + r * Math.sin(angle);
+          const x2 = cx + r * Math.cos(endAngle),
+            y2 = cy + r * Math.sin(endAngle);
+          const ix1 = cx + innerR * Math.cos(angle),
+            iy1 = cy + innerR * Math.sin(angle);
+          const ix2 = cx + innerR * Math.cos(endAngle),
+            iy2 = cy + innerR * Math.sin(endAngle);
+          const large = slice > Math.PI ? 1 : 0;
+          const d = `M ${x1} ${y1} A ${r} ${r} 0 ${large} 1 ${x2} ${y2} L ${ix2} ${iy2} A ${innerR} ${innerR} 0 ${large} 0 ${ix1} ${iy1} Z`;
+          paths += `<path d="${d}" fill="${row.color}" stroke="#fff" stroke-width="1.5"/>`;
+          angle = endAngle;
+        }
+        paths += `<circle cx="${cx}" cy="${cy}" r="${innerR}" fill="white"/>`;
+        return { svgInner: paths, pctMap };
+      }
+
+      /** Budget Breakdown donut: planned split when nothing spent yet; spending split once receipts land. */
+      function renderPie(totalSpent) {
+        const svg = document.getElementById("pieChart");
+        const emptyNotice = document.getElementById("emptyNotice");
+        const legend = document.getElementById("legend");
+        const sub = document.getElementById("breakdownSubtitle");
+
+        const cx = 100,
+          cy = 100,
+          r = 86,
+          innerR = 52;
+
+        const plannedItems = CATEGORIES.filter((c) => c.budget > 0).map(
+          (c) => ({
+            name: c.name,
+            value: c.budget,
+            color: c.color,
+          })
+        );
+
+        let items;
+        if (totalSpent > 0) {
+          items = CATEGORIES.filter(
+            (c) => c.spent > 0 && c.name !== "Savings"
+          ).map((c) => ({
+            name: c.name,
+            value: c.spent,
+            color: c.color,
+          }));
+          sub.textContent =
+            "Spending this month — each slice shows where your money went (excluding Savings).";
+        } else {
+          items = plannedItems.length > 0 ? plannedItems : [];
+          sub.textContent =
+            "Planned budgets — slices match your targets. Upload a receipt to switch to real spending.";
+        }
+
+        legend.style.display = "flex";
+
+        if (!items.length) {
+          emptyNotice.style.display = "";
+          emptyNotice.innerHTML =
+            "<p>Set up income and categories in Budget Setup so we can draw your breakdown.</p>";
+          legend.style.display = "none";
+          sub.textContent = "Finish budget setup to see your plan here.";
+          svg.innerHTML = `
+        <circle cx="${cx}" cy="${cy}" r="${r}" fill="#E5E7EB"/>
+        <circle cx="${cx}" cy="${cy}" r="${innerR}" fill="white"/>
+      `;
+          return;
+        }
+
+        const { svgInner, pctMap } = pieArcDonutSlices(
+          items,
+          cx,
+          cy,
+          r,
+          innerR
+        );
+        svg.innerHTML = svgInner;
+
+        legend.innerHTML = pctMap
+          .map(({ row, pct }) => {
+            const amt = fmt(row.value);
+            const subtitle =
+              totalSpent > 0 ? "spent this month" : "planned monthly";
+            return `
+      <div class="legend-item">
+        <div class="legend-dot" style="background:${row.color}"></div>
+        <span class="legend-label">${row.name} · ${pct}% · ${subtitle} · ${amt}</span>
+      </div>`;
+          })
+          .join("");
+
+        emptyNotice.style.display = pctMap.length === 0 ? "" : "none";
+      }
+
+      function renderCategories() {
+        const list = document.getElementById("catList");
+        list.innerHTML = CATEGORIES.map((cat) => {
+          const pct =
+            cat.budget > 0
+              ? Math.min(Math.max((cat.spent / cat.budget) * 100, 0), 100)
+              : 0;
+          const remaining = cat.budget - cat.spent;
+          return `
+        <div class="cat-row">
+          <div class="cat-header">
+            <div class="cat-name-wrap">
+              <div class="cat-dot" style="background:${cat.color}"></div>
+              <span class="cat-name">${cat.name}</span>
+            </div>
+            <span class="cat-left">${fmt(remaining)} left</span>
+          </div>
+          <div class="progress-wrap">
+            <div class="progress-track">
+              <div class="progress-fill" style="width:${pct}%"></div>
+            </div>
+            <span class="progress-text">${fmt(cat.spent)} / ${fmt(
+            cat.budget
+          )}</span>
+          </div>
+        </div>`;
+        }).join("");
+      }
+
+      // initial render
+      render();
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        onAuthStateChanged,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBaqKm60VgJ2dheoVQMuTnjJTPSODlOLQY",
+        authDomain: "budgetbuddy-71228.firebaseapp.com",
+        projectId: "budgetbuddy-71228",
+        storageBucket: "budgetbuddy-71228.firebasestorage.app",
+        messagingSenderId: "640538173959",
+        appId: "1:640538173959:web:686bf17585efc685f5c0a2",
+        measurementId: "G-WDNG5KGEDC",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) {
+          window.location.href = "LogInPage.html";
+          return;
+        }
+
+        const docRef = doc(db, "budgets", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+
+          localStorage.setItem("income", String(data.income));
+          localStorage.setItem("rent", String(data.rent));
+          localStorage.setItem("savings", String(data.savings));
+          localStorage.setItem("budgetData", JSON.stringify(data));
+
+          loadBudgetSetup();
+          render();
+        } else {
+          window.location.href = "BudgetSetup.html";
+        }
+      });
+    </script>
+  </body>
+</html>

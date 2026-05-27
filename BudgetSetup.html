@@ -1,0 +1,535 @@
+    <!DOCTYPE html>
+    <html lang="en">
+      <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Let's Set Up Your Budget</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+        <style>
+          *,
+          *::before,
+          *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+          }
+
+          body {
+            font-family: "Inter", sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+          }
+
+          /* ── Layout ── */
+          .page {
+            min-height: 100vh;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(
+              135deg,
+              #fce7f3 0%,
+              #ede9fe 50%,
+              #dbeafe 100%
+            );
+          }
+
+          /* ── Decorative emojis ── */
+          .deco {
+            position: absolute;
+            opacity: 0.2;
+            pointer-events: none;
+            user-select: none;
+          }
+          .deco-1 {
+            top: 2.5rem;
+            right: 2.5rem;
+            font-size: 3rem;
+          }
+          .deco-2 {
+            bottom: 5rem;
+            left: 2.5rem;
+            font-size: 2.5rem;
+          }
+          .deco-3 {
+            top: 10rem;
+            left: 10rem;
+            font-size: 2rem;
+          }
+          .deco-4 {
+            bottom: 8rem;
+            right: 8rem;
+            font-size: 2.5rem;
+          }
+
+          /* ── Content wrapper ── */
+          .content {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 42rem;
+            margin: 0 auto;
+            padding: 2.5rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+          }
+
+          /* ── Logo ── */
+          .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 1rem;
+            background-color: #4f46e5;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+          }
+
+          /* ── Heading ── */
+          .heading {
+            text-align: center;
+          }
+          .heading h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111827;
+            line-height: 1.25;
+            letter-spacing: -0.025em;
+          }
+          .heading p {
+            margin-top: 0.5rem;
+            font-size: 1rem;
+            color: #6b7280;
+          }
+
+          /* ── Card ── */
+          .card {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+          }
+
+          /* ── Form ── */
+          .form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.75rem;
+          }
+
+          .field {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+          }
+
+          .field label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #111827;
+          }
+
+          .input-wrap {
+            position: relative;
+          }
+
+          .input-wrap .prefix {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #9ca3af;
+            font-size: 1rem;
+            pointer-events: none;
+          }
+
+          .input-wrap input {
+            width: 100%;
+            height: 2.25rem;
+            padding-left: 1.75rem;
+            padding-right: 0.75rem;
+            border-radius: 0.5rem;
+            background-color: #f3f3f5;
+            border: 1px solid transparent;
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-family: inherit;
+            outline: none;
+            transition: background-color 0.15s, box-shadow 0.15s;
+            -moz-appearance: textfield;
+          }
+
+          .input-wrap input::-webkit-outer-spin-button,
+          .input-wrap input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+          }
+
+          .input-wrap input:focus {
+            background-color: #ffffff;
+            box-shadow: 0 0 0 2px #6366f1;
+          }
+
+          .field .hint {
+            font-size: 0.875rem;
+            color: #9ca3af;
+          }
+
+          /* ── Submit button ── */
+          .btn-submit {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            height: 2.5rem;
+            border-radius: 0.5rem;
+            background-color: #030213;
+            color: #ffffff;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.15s;
+          }
+
+          .btn-submit:hover {
+            background-color: #1f2937;
+          }
+
+          /* ── Pro tip box ── */
+          .pro-tip {
+            width: 100%;
+            border-radius: 0.75rem;
+            border: 1px solid #bfdbfe;
+            background-color: #eff6ff;
+            padding: 1rem 1.25rem;
+          }
+
+          .pro-tip p {
+            font-size: 0.875rem;
+            color: #1d4ed8;
+            line-height: 1.5;
+          }
+
+          .pro-tip strong {
+            font-weight: 600;
+          }
+
+          /* ── Result card (shown after submit) ── */
+          .result {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 1rem;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            display: none;
+          }
+
+          .result h2 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 1.25rem;
+            text-align: center;
+          }
+
+          .budget-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.625rem 0;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 0.875rem;
+          }
+
+          .budget-row:last-child {
+            border-bottom: none;
+          }
+
+          .budget-row .cat {
+            color: #374151;
+          }
+          .budget-row .amt {
+            font-weight: 600;
+            color: #111827;
+          }
+          .budget-row .cat span {
+            margin-right: 0.5rem;
+          }
+
+          .budget-row.total .cat {
+            font-weight: 700;
+            color: #111827;
+          }
+          .budget-row.total .amt {
+            color: #4f46e5;
+            font-size: 1rem;
+          }
+
+          .btn-reset {
+            margin-top: 1.25rem;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 2.25rem;
+            border-radius: 0.5rem;
+            background-color: #f3f4f6;
+            color: #374151;
+            font-size: 0.875rem;
+            font-weight: 500;
+            font-family: inherit;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.15s;
+          }
+
+          .btn-reset:hover {
+            background-color: #e5e7eb;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="page">
+          <!-- Decorative emojis -->
+          <span class="deco deco-1">🌸</span>
+          <span class="deco deco-2">🌷</span>
+          <span class="deco deco-3">🌼</span>
+          <span class="deco deco-4">🦋</span>
+
+          <div class="content">
+            <!-- Logo -->
+            <div class="logo">
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 40 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M20 3.33334V36.6667"
+                  stroke="white"
+                  stroke-width="3.33333"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path
+                  d="M28.3333 8.33334H15.8333C14.2862 8.33334 12.8025 8.94792 11.7085 10.0419C10.6146 11.1358 10 12.6196 10 14.1667C10 15.7138 10.6146 17.1975 11.7085 18.2915C12.8025 19.3854 14.2862 20 15.8333 20H24.1667C25.7138 20 27.1975 20.6146 28.2915 21.7085C29.3854 22.8025 30 24.2862 30 25.8333C30 27.3804 29.3854 28.8642 28.2915 29.9581C27.1975 31.0521 25.7138 31.6667 24.1667 31.6667H10"
+                  stroke="white"
+                  stroke-width="3.33333"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+
+            <!-- Heading -->
+            <div class="heading">
+              <h1>Let's Set Up Your Budget</h1>
+              <p>
+                Tell us about your finances so we can create a personalized
+                budget
+              </p>
+            </div>
+
+            <!-- Form card -->
+            <div class="card" id="formCard">
+              <div class="form">
+                <!-- Monthly Income -->
+                <div class="field">
+                  <label for="income">Monthly Income</label>
+                  <div class="input-wrap">
+                    <span class="prefix">$</span>
+                    <input type="number" id="income" value="" min="0" />
+                  </div>
+                  <p class="hint">
+                    Include all sources: job, allowance, scholarships, etc.
+                  </p>
+                </div>
+
+                <!-- Monthly Rent / Housing -->
+                <div class="field">
+                  <label for="rent">Monthly Rent / Housing</label>
+                  <div class="input-wrap">
+                    <span class="prefix">$</span>
+                    <input type="number" id="rent" value="" min="0" />
+                  </div>
+                  <p class="hint">Your monthly rent and housing costs</p>
+                </div>
+
+                <!-- Monthly Savings Goal -->
+                <div class="field">
+                  <label for="savings">Monthly Savings Goal</label>
+                  <div class="input-wrap">
+                    <span class="prefix">$</span>
+                    <input type="number" id="savings" value="" min="0" />
+                  </div>
+                  <p class="hint">How much you want to save each month</p>
+                </div>
+
+                <!-- Submit -->
+                <button class="btn-submit" onclick="createBudget()">
+                  Create My Budget
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M3.33301 7.99915H12.6653"
+                      stroke="white"
+                      stroke-width="1.33319"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M7.99915 3.33298L12.6653 7.99914L7.99915 12.6653"
+                      stroke="white"
+                      stroke-width="1.33319"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Result card (hidden until submit) -->
+            <div class="result" id="resultCard">
+              <h2>📊 Your Personalized Budget</h2>
+              <div id="budgetRows"></div>
+              <button class="btn-reset" onclick="resetForm()">
+                ← Start Over
+              </button>
+            </div>
+
+            <!-- Pro tip -->
+            <div class="pro-tip">
+              <p>
+                💡 <strong>Pro tip:</strong> We'll automatically distribute your
+                remaining budget across categories like food, entertainment, and
+                shopping to help you live your best life without overspending!
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBaqKm60VgJ2dheoVQMuTnjJTPSODlOLQY",
+  authDomain: "budgetbuddy-71228.firebaseapp.com",
+  projectId: "budgetbuddy-71228",
+  storageBucket: "budgetbuddy-71228.firebasestorage.app",
+  messagingSenderId: "640538173959",
+  appId: "1:640538173959:web:686bf17585efc685f5c0a2",
+  measurementId: "G-WDNG5KGEDC",
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    currentUser = user;
+  } else {
+    window.location.href = "LogInPage.html";
+  }
+});      
+window.createBudget = async function () {
+            const income =
+              parseFloat(document.getElementById("income").value) || 0;
+            const rent = parseFloat(document.getElementById("rent").value) || 0;
+            const savings =
+              parseFloat(document.getElementById("savings").value) || 0;
+
+            const remaining = income - rent;
+
+            if (remaining < 0) {
+              alert("Your expenses + savings exceed your income!");
+              return;
+            }
+
+            // Auto allocation (matches MainBudget category mix, includes clothing)
+            const food = Math.round(remaining * 0.2);
+            const transport = Math.round(remaining * 0.18);
+            const entertainment = Math.round(remaining * 0.14);
+            const shopping = Math.round(remaining * 0.12);
+            const clothing = Math.round(remaining * 0.1);
+            const other =
+              remaining -
+              food -
+              transport -
+              entertainment -
+              shopping -
+              clothing;
+
+            const categories = [
+              { emoji: "🏠", label: "Housing / Rent", amount: rent },
+              { emoji: "💰", label: "Savings", amount: savings },
+              { emoji: "🍔", label: "Food & Groceries", amount: food },
+              { emoji: "🚗", label: "Transport", amount: transport },
+              { emoji: "🎉", label: "Entertainment", amount: entertainment },
+              { emoji: "🛍️", label: "Shopping", amount: shopping },
+              { emoji: "👕", label: "Clothing & Apparel", amount: clothing },
+              { emoji: "📦", label: "Other / Buffer", amount: other },
+            ];
+
+            // store both simple keys (used by your MainBudget) and a structured object
+            localStorage.setItem("income", String(income));
+            localStorage.setItem("rent", String(rent));
+            localStorage.setItem("savings", String(savings));
+            localStorage.setItem(
+              "budgetData",
+              JSON.stringify({ income, rent, savings, categories })
+            );
+
+            if (currentUser) {
+  await setDoc(doc(db, "budgets", currentUser.uid), {
+    income,
+    rent,
+    savings,
+    categories,
+    createdAt: new Date(),
+  });
+
+  console.log("Budget saved for:", currentUser.uid);
+}
+
+            // navigate to main budget
+            window.location.href = "MainBudget.html";
+          }
+
+          function resetForm() {
+            document.getElementById("formCard").style.display = "block";
+            document.getElementById("resultCard").style.display = "none";
+          }
+        </script>
+      </body>
+    </html>
+    BudgetSetup.html Displaying BudgetSetup.html.</vk577@scarletmail.rutgers.edu
+  ></sk3340@scarletmail.rutgers.edu
+>

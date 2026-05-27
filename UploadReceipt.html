@@ -1,0 +1,1682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Upload Receipt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #FDF2F8 0%, #FAF5FF 50%, #EFF6FF 100%);
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative;
+      width: 100%;
+      min-height: 100px;
+      overflow: hidden;
+      background: linear-gradient(90deg, #FDA5D5 0%, #DAB2FF 50%, #8EC5FF 100%);
+    }
+
+    .deco {
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+      opacity: 0.2;
+    }
+    .deco-1 { right: 2rem;  top: 0.5rem;   font-size: 2.25rem; }
+    .deco-2 { left: 5rem;   bottom: 0.75rem; font-size: 1.875rem; }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0 2.5rem;
+      height: 100px;
+    }
+
+    @media (max-width: 640px) { .header-inner { padding: 0 1.5rem; } }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.20); }
+
+    .header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.30);
+      flex-shrink: 0;
+    }
+
+    .header-text { display: flex; flex-direction: column; }
+
+    .header-text .title {
+      color: #ffffff;
+      font-size: 1.5rem;
+      font-weight: 700;
+      line-height: 2rem;
+      letter-spacing: 0.07px;
+    }
+
+    .header-text .subtitle {
+      color: #F3E8FF;
+      font-size: 0.875rem;
+      font-weight: 400;
+      line-height: 1.25rem;
+      letter-spacing: -0.15px;
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 3rem 1rem 6rem;
+    }
+    @media (max-width: 640px) { main { padding: 2rem 1rem 4rem; } }
+
+    /* ── Card ── */
+    .card {
+      width: 100%;
+      max-width: 640px;
+      background: #ffffff;
+      border-radius: 14px;
+      border: 0.556px solid rgba(0,0,0,0.10);
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    .card-title {
+      color: #0A0A0A;
+      font-size: 1.25rem;
+      font-weight: 700;
+      line-height: 1.75rem;
+      letter-spacing: -0.449px;
+    }
+
+    /* ── Controls ── */
+    .controls { display: flex; flex-direction: column; gap: 1rem; }
+
+    /* ── Drop zone ── */
+    .drop-zone {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 1.667px dashed #D1D5DC;
+      border-radius: 10px;
+      padding: 3.25rem 1rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      text-align: center;
+    }
+    .drop-zone:hover { background: #f9fafb; }
+    .drop-zone.dragging {
+      border-color: #a855f7;
+      background: #faf5ff;
+    }
+
+    #file-input { display: none; }
+
+    .drop-icon { margin-bottom: 1rem; }
+
+    .drop-text-primary {
+      font-size: 0.875rem;
+      color: #4A5565;
+      line-height: 1.25rem;
+      letter-spacing: -0.15px;
+    }
+    .drop-text-primary strong { font-weight: 600; }
+
+    .drop-text-secondary {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #6A7282;
+      margin-top: 0.25rem;
+      line-height: 1rem;
+    }
+
+    /* selected file state */
+    .file-name {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #9333ea;
+      line-height: 1.25rem;
+    }
+    .file-ok {
+      font-size: 0.75rem;
+      color: #6A7282;
+      display: block;
+      margin-top: 0.25rem;
+    }
+    .file-error {
+      font-size: 0.75rem;
+      color: #dc2626;
+      display: block;
+      margin-top: 0.25rem;
+    }
+    .ocr-preview {
+      margin-top: 1rem;
+      width: 100%;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 0.75rem;
+      background: #fafafa;
+      text-align: left;
+    }
+    .ocr-preview p {
+      font-size: 0.75rem;
+      color: #374151;
+      line-height: 1.2rem;
+      margin-bottom: 0.35rem;
+    }
+    .ocr-edit-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+      margin-bottom: 0.45rem;
+      align-items: center;
+    }
+    .ocr-edit-input, .ocr-edit-select {
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      padding: 0.4rem 0.55rem;
+      font-size: 0.75rem;
+      font-family: inherit;
+      background: #fff;
+    }
+    .detected-amount-box {
+      margin-top: 0.5rem;
+      border: 1px solid #dbeafe;
+      border-radius: 8px;
+      background: #eff6ff;
+      padding: 0.6rem;
+    }
+    .detected-amount-label {
+      font-size: 0.72rem;
+      color: #1e40af;
+      margin-bottom: 0.3rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .detected-amount-value {
+      font-size: 1rem;
+      color: #1e3a8a;
+      font-weight: 700;
+    }
+    .line-items {
+      margin-top: 0.55rem;
+      border-top: 1px solid #e5e7eb;
+      padding-top: 0.55rem;
+    }
+    .line-items p {
+      margin-bottom: 0.35rem;
+    }
+    .line-items-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      max-height: 170px;
+      overflow: auto;
+    }
+    .line-items-list li {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      align-items: center;
+      gap: 0.35rem 0.5rem;
+      font-size: 0.75rem;
+      color: #1f2937;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 0.35rem 0.45rem;
+    }
+    .line-item-name {
+      flex: 1;
+      min-width: 0;
+      word-break: break-word;
+    }
+    .line-item-price {
+      font-weight: 700;
+      color: #065f46;
+      white-space: nowrap;
+    }
+    .continue-btn {
+      margin-top: 0.75rem;
+      border: none;
+      border-radius: 6px;
+      background: #111827;
+      color: white;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.75rem;
+      cursor: pointer;
+    }
+    .drop-zone .ocr-preview {
+      cursor: default;
+      text-align: left;
+    }
+    .split-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #374151;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      margin: 0.75rem 0 0.35rem;
+    }
+    .split-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .split-row .ocr-split-cat { flex: 1; min-width: 140px; }
+    .split-row .ocr-split-amt { width: 6.5rem; }
+    .line-item-cat {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: #6b21a8;
+      background: #f3e8ff;
+      padding: 0.15rem 0.35rem;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    .line-items-list { max-height: 240px; }
+    .receipt-review-host {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .receipt-review-host .ocr-preview {
+      margin-top: 0;
+    }
+
+    /* ── Divider ── */
+    .divider {
+      position: relative;
+      display: flex;
+      align-items: center;
+      height: 1.25rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      border-top: 0.556px solid #D1D5DC;
+    }
+    .divider span {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #ffffff;
+      padding: 0 0.5rem;
+      font-size: 0.875rem;
+      color: #717182;
+      line-height: 1.25rem;
+      letter-spacing: -0.15px;
+      white-space: nowrap;
+    }
+
+    /* ── Camera button ── */
+    .camera-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      width: 100%;
+      border-radius: 8px;
+      padding: 0.5625rem 0;
+      background: #ffffff;
+      border: 0.556px solid rgba(0,0,0,0.10);
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+    .camera-btn:hover  { background: #f9fafb; }
+    .camera-btn:active { background: #f3f4f6; }
+
+    .camera-btn span {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #0A0A0A;
+      line-height: 1.25rem;
+      letter-spacing: -0.15px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <span class="deco deco-1">🌸</span>
+    <span class="deco deco-2">🌼</span>
+
+    <div class="header-inner">
+      <!-- Back button -->
+      <button class="back-btn" onclick="history.back()" aria-label="Go back">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M7.99913 12.6653L3.33297 7.99917L7.99913 3.33301" stroke="white" stroke-width="1.33319" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12.6653 7.99915H3.33297" stroke="white" stroke-width="1.33319" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Icon -->
+      <div class="header-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M20.9939 14.9956V18.9944C20.9939 19.5247 20.7833 20.0333 20.4083 20.4083C20.0333 20.7832 19.5248 20.9939 18.9945 20.9939H4.99855C4.46827 20.9939 3.95971 20.7832 3.58475 20.4083C3.20978 20.0333 2.99913 19.5247 2.99913 18.9944V14.9956" stroke="white" stroke-width="1.99942" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16.9951 7.9977L11.9965 2.99915L6.99797 7.9977" stroke="white" stroke-width="1.99942" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.9965 2.99915V14.9957" stroke="white" stroke-width="1.99942" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Text -->
+      <div class="header-text">
+        <span class="title">Upload Receipt 📸</span>
+        <span class="subtitle">Snap and save your receipts</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="card">
+      <h1 class="card-title">Upload Your Receipt</h1>
+
+      <div class="controls">
+        <!-- Drop zone -->
+        <div
+          class="drop-zone"
+          id="drop-zone"
+          onclick="onDropZoneActivate(event)"
+          ondragover="onDragOver(event)"
+          ondragleave="onDragLeave(event)"
+          ondrop="onDrop(event)"
+        >
+          <input type="file" id="file-input" accept="image/png,image/jpeg,image/heic,image/heif,.heic,.heif" onchange="onFileChange(event)" />
+
+          <svg class="drop-icon" width="48" height="48" viewBox="0 0 48 48" fill="none">
+            <path d="M41.9955 29.9968V37.996C41.9955 39.0567 41.5741 40.074 40.824 40.8241C40.0739 41.5741 39.0566 41.9955 37.9959 41.9955H9.99893C8.93817 41.9955 7.92087 41.5741 7.1708 40.8241C6.42074 40.074 5.99936 39.0567 5.99936 37.996V29.9968" stroke="#99A1AF" stroke-width="3.99957" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M33.9963 15.9982L23.9974 5.99927L13.9985 15.9982" stroke="#99A1AF" stroke-width="3.99957" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M23.9974 5.99927V29.9967" stroke="#99A1AF" stroke-width="3.99957" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+
+          <div id="drop-label">
+            <p class="drop-text-primary"><strong>Click to upload</strong> or drag and drop</p>
+            <p class="drop-text-secondary">PNG, JPG (MAX. 10MB)</p>
+          </div>
+        </div>
+
+        <!-- Review UI lives outside the drop zone so category dropdowns never open the file picker -->
+        <div id="receipt-review-root" class="receipt-review-host"></div>
+
+        <!-- Divider -->
+        <div class="divider"><span>or</span></div>
+
+        <!-- Camera button -->
+        <button class="camera-btn" onclick="triggerCamera()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <g clip-path="url(#cam-clip)">
+              <path d="M9.66562 2.66626H6.33265L4.66616 4.66604H2.66638C2.3128 4.66604 1.97369 4.8065 1.72367 5.05652C1.47365 5.30655 1.33319 5.64565 1.33319 5.99923V11.9986C1.33319 12.3522 1.47365 12.6913 1.72367 12.9413C1.97369 13.1913 2.3128 13.3318 2.66638 13.3318H13.3319C13.6855 13.3318 14.0246 13.1913 14.2746 12.9413C14.5246 12.6913 14.6651 12.3522 14.6651 11.9986V5.99923C14.6651 5.64565 14.5246 5.30655 14.2746 5.05652C14.0246 4.8065 13.6855 4.66604 13.3319 4.66604H11.3321L9.66562 2.66626Z" stroke="#0A0A0A" stroke-width="1.33319" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M7.99914 10.6656C9.10359 10.6656 9.99893 9.77025 9.99893 8.6658C9.99893 7.56135 9.10359 6.66602 7.99914 6.66602C6.89469 6.66602 5.99936 7.56135 5.99936 8.6658C5.99936 9.77025 6.89469 10.6656 7.99914 10.6656Z" stroke="#0A0A0A" stroke-width="1.33319" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+            <defs>
+              <clipPath id="cam-clip">
+                <rect width="15.9983" height="15.9983" fill="white"/>
+              </clipPath>
+            </defs>
+          </svg>
+          <span>Take a Photo</span>
+        </button>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/heic2any/dist/heic2any.min.js"></script>
+  <script src="https://unpkg.com/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script>
+    const zone  = document.getElementById('drop-zone');
+    const label = document.getElementById('drop-label');
+    const reviewRoot = document.getElementById('receipt-review-root');
+    const RECEIPTS_STORAGE_KEY = 'budgetbuddy.receipts';
+    const RECEIPT_CATEGORIES = [
+      'Clothing & Apparel',
+      'Food & Dining',
+      'Other',
+      'Transportation',
+      'Entertainment',
+      'Shopping',
+      'Bills & Utilities',
+    ];
+    let pendingReceiptDraft = null;
+
+    function round2(n) {
+      return Math.round(Number(n) * 100) / 100;
+    }
+
+    function onDropZoneActivate(e) {
+      const t = e.target;
+      if (t.closest('select, input, button, textarea, .ocr-preview, .line-items-list, label')) {
+        e.stopPropagation();
+        return;
+      }
+      document.getElementById('file-input').click();
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+    function escAttr(s) {
+      return escHtml(String(s || '')).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    async function prepareFileForOCR(file) {
+      const isHeicName = /\.(heic|heif)$/i.test(file.name || '');
+      const isHeicType = /image\/(heic|heif)/i.test(file.type || '');
+      if (!isHeicName && !isHeicType) return file;
+
+      if (typeof heic2any !== 'function') {
+        throw new Error('HEIC converter failed to load. Please refresh and try again.');
+      }
+
+      const convertedBlob = await heic2any({ blob: file, toType: 'image/jpeg', quality: 0.92 });
+      const jpegBlob = Array.isArray(convertedBlob) ? convertedBlob[0] : convertedBlob;
+      const baseName = (file.name || 'receipt').replace(/\.(heic|heif)$/i, '');
+      return new File([jpegBlob], `${baseName}.jpg`, { type: 'image/jpeg' });
+    }
+
+    /**
+     * Grayscale + contrast + adaptive binarize — wrinkled thermal receipts read much cleaner in Tesseract.
+     */
+    async function preprocessReceiptImageForOCR(file) {
+      if (!file || !/^image\//i.test(file.type || '')) return null;
+      try {
+        const url = URL.createObjectURL(file);
+        const img = new Image();
+        await new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = reject;
+          img.src = url;
+        });
+        URL.revokeObjectURL(url);
+
+        let w = img.naturalWidth || img.width;
+        let h = img.naturalHeight || img.height;
+        if (!w || !h) return null;
+
+        const maxSide = 2600;
+        const minTarget = 1400;
+        let scale = 1;
+        if (Math.max(w, h) < minTarget) scale = Math.min(2.75, minTarget / Math.max(w, h));
+        if (Math.max(w, h) * scale > maxSide) scale = maxSide / Math.max(w, h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(img, 0, 0, w, h);
+        const imgData = ctx.getImageData(0, 0, w, h);
+        const d = imgData.data;
+        let lumSum = 0;
+        const gr = new Float32Array((w * h) | 0);
+        let p = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const y = 0.299 * d[i] + 0.587 * d[i + 1] + 0.114 * d[i + 2];
+          gr[p++] = y;
+          lumSum += y;
+        }
+        const mean = lumSum / gr.length;
+        const contrast = mean > 175 ? 1.45 : 1.25;
+        const thresh = mean > 175 ? 168 : 142;
+
+        p = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          let y = (gr[p++] - 128) * contrast + 128;
+          y = Math.max(0, Math.min(255, y));
+          const v = y >= thresh ? 255 : 0;
+          d[i] = d[i + 1] = d[i + 2] = v;
+        }
+        ctx.putImageData(imgData, 0, 0);
+
+        const blob = await new Promise((res) => canvas.toBlob((b) => res(b), 'image/png'));
+        return blob || null;
+      } catch {
+        return null;
+      }
+    }
+
+    function normalizeOcrLineKey(line) {
+      return String(line || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9.@=\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    /** Append lines from secondary that primary missed (keeps primary order). */
+    function mergeOcrTexts(primary, secondary) {
+      const a = String(primary || '');
+      const b = String(secondary || '');
+      if (!b.trim()) return a;
+      if (!a.trim()) return b;
+      const pLines = a.split(/\n/).map((l) => l.trim()).filter((l) => l.length > 1);
+      const keys = new Set(pLines.map(normalizeOcrLineKey).filter(Boolean));
+      const out = [...pLines];
+      for (const raw of b.split(/\n/)) {
+        const line = raw.trim();
+        if (line.length < 2) continue;
+        const k = normalizeOcrLineKey(line);
+        if (k.length < 2) continue;
+        if (!keys.has(k)) {
+          keys.add(k);
+          out.push(line);
+        }
+      }
+      return out.join('\n');
+    }
+
+    function scoreOcrTextQuality(text) {
+      const t = String(text || '');
+      const lines = t.split(/\n/).filter((l) => l.trim().length > 2);
+      const prices = (t.match(/\b\d{1,3}\.\d{2}\b/g) || []).length;
+      return lines.length * 3 + prices * 2 + Math.min(t.length, 8000) * 0.02;
+    }
+
+    /**
+     * When OCR garbles "Sub Total" / "Total Charge" lines, the true total often still appears as xx.xx
+     * near those keywords or as the largest plausible currency amount on the receipt.
+     */
+    function auditGrandTotalFromRawText(text, lineSum, detectedTotal) {
+      const normalized = String(text || '');
+      const lines = normalized.split(/\n/).map((l) => l.trim()).filter(Boolean);
+      const allPrices = [];
+      const rePrice = /\b(\d{1,3}\.\d{2})\b/g;
+      let mm;
+      while ((mm = rePrice.exec(normalized)) !== null) {
+        const v = parseCurrency(mm[1]);
+        if (v != null && v >= 0.5 && v < 10000) allPrices.push(v);
+      }
+      if (!allPrices.length) return detectedTotal;
+
+      const maxP = Math.max(...allPrices);
+      const totalishAmounts = [];
+      for (const line of lines) {
+        const low = line.toLowerCase().replace(/\$/g, '');
+        if (/\btax\s+total\b/i.test(low) && !/charg|tend|sub|due|balance/i.test(low)) continue;
+        const looksTotalish =
+          /sub\s*tot|subtotal|total\s*charg|total\s*tend|total\s+tend|charg|tender|amount\s*due|balance\s*due|grand\s*tot|tot\s*charg|due\s*[:.]?/i.test(
+            line
+          ) || (/total/i.test(line) && /charg|tend|sub|due|bal/i.test(line));
+        if (!looksTotalish) continue;
+        let m;
+        const r2 = /\b(\d{1,3}\.\d{2})\b/g;
+        while ((m = r2.exec(line)) !== null) {
+          const v = parseCurrency(m[1]);
+          if (v != null && v >= 1) totalishAmounts.push(v);
+        }
+      }
+
+      const fromLabels = totalishAmounts.length ? Math.max(...totalishAmounts) : null;
+      let candidate = detectedTotal;
+
+      if (fromLabels != null && fromLabels >= 1) {
+        if (candidate == null || candidate < 0.02 || fromLabels >= candidate - 0.01) candidate = fromLabels;
+      }
+
+      const sum = lineSum || 0;
+      if (sum >= 0.02 && maxP > sum * 1.2 + 1) {
+        if (fromLabels != null && fromLabels > sum * 1.05) candidate = Math.max(candidate || 0, fromLabels);
+        else if (maxP > sum * 1.2 + 1 && maxP <= 800) candidate = Math.max(candidate || 0, maxP);
+      }
+
+      if ((candidate == null || candidate < sum - 0.5) && sum >= 0.02) candidate = sum;
+      return candidate != null && candidate >= 0.02 ? round2(candidate) : detectedTotal;
+    }
+
+    function parseCurrency(raw) {
+      const normalized = String(raw || '').replace(/[^0-9.]/g, '');
+      const value = Number(normalized);
+      return Number.isFinite(value) ? value : null;
+    }
+
+    function formatCurrency(amount) {
+      return amount == null ? 'Amount not found' : `$${Number(amount).toFixed(2)}`;
+    }
+
+    function isSkippableLineForItems(line) {
+      const l = String(line).toLowerCase().trim();
+      if (!l) return true;
+      if (/^\s*tax\b|tax\s*\d|taxable|sub\s*tot|subtotal|^total\b|^grand\s*total|amount due|balance due/i.test(l)) return true;
+      if (/\btotal\s+charg|\btotal\s+tend/i.test(l)) return true;
+      if (/^reg\s+[\d.]+\s+savings\b|^savings\s+[\d.]+/i.test(l)) return true;
+      if (/^(reg|rex)\b/i.test(l) && /savings/i.test(l)) return true;
+      if (/store\s+credit|points\s+collected|closing\s+points/i.test(l)) return true;
+      if (/visa|mastercard|amex|discover|\bcredit\b|\bdebit\b|tend|tender|change due|cash back|approval|auth\.?|aid\b|chip|insert|tap to pay|contactless/i.test(l)) return true;
+      if (/items sold|item count|member #|trans\.?\s*#|store\.?\s*#|receipt #|thank you|survey|how was|www\.|http/i.test(l)) return true;
+      if (/^-{2,}/.test(l)) return true;
+      if (/^e?dcard|gift card|shop card/i.test(l)) return true;
+      return false;
+    }
+
+    function normalizeStubName(s) {
+      return String(s || '')
+        .toLowerCase()
+        .replace(/\$/g, ' ')
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    /** Footer / summary rows — not products (still used for detected total elsewhere). */
+    function isReceiptSummaryStubName(name) {
+      const n = normalizeStubName(name);
+      if (!n) return true;
+      if (/\btotal\s+charg/.test(n)) return true;
+      if (/\btotal\s+tend/.test(n)) return true;
+      if (/\bgrand\s+total\b/.test(n)) return true;
+      if (/^sub\s*total\b|^subtotal\b/.test(n)) return true;
+      if (/\bamount\s+due\b/.test(n)) return true;
+      if (/\bbalance\s+due\b/.test(n)) return true;
+      if (/^tax\s+total\b/.test(n)) return true;
+      if (n === 'total' || /^total\s*$/.test(n)) return true;
+      return false;
+    }
+
+    /** “Reg 12.00 Savings” / OCR “Rex … Savings” detail lines under a discounted item. */
+    function isSavingsOrRegDetailStub(name) {
+      const n = normalizeStubName(name);
+      if (/^reg\s+[\d.]+\s+savings\b/.test(n)) return true;
+      if (/^rex\s+[\d\s]+\s*savings/.test(n)) return true;
+      if (/\bsavings\s*$/.test(n) && /^(reg|rex)\b/.test(n)) return true;
+      if (/,\s*savings\s*$/.test(n) && /(reg|rex)/.test(n)) return true;
+      return false;
+    }
+
+    function isNonProductReceiptLineName(name) {
+      return isReceiptSummaryStubName(name) || isSavingsOrRegDetailStub(name);
+    }
+
+    function itemLooksLikePayment(name, amount) {
+      const n = String(name || '').toLowerCase();
+      if (!/[a-z]/i.test(String(name || ''))) return true;
+      return /visa|mastercard|amex|discover|credit|debit|tend|tender|change due/.test(n) && Math.abs(Number(amount) || 0) >= 5;
+    }
+
+    /** OCR often glues store header + SKU + item into one “line” — drop those. */
+    function isOcrJunkMergedLine(line) {
+      const l = String(line).replace(/\s+/g, ' ');
+      if (/\d{8,12}/.test(l) && /\d{1,2}\/\d{1,2}\/\d{2,4}/.test(l) && /[A-Za-z]{2,}/.test(l)) {
+        if (/EDISON|,?\s*N\.?J\.?|\bNJ\b|CLUB\s+MANAGER|MANAGER/i.test(l)) return true;
+      }
+      if (l.length > 90 && (l.match(/\d{8,12}/g) || []).length >= 2) return true;
+      return false;
+    }
+
+    function itemLooksLikeJunkItem(it) {
+      const n = String(it.name || '');
+      const u = n.toUpperCase();
+      const letters = (n.match(/[a-z]/gi) || []).length;
+      if ((/EDISON|,?\s*N\.?J\.?|\bNJ\b/.test(u) && /088\d{2,}/.test(n)) || (/EDISON/.test(u) && letters < 8)) return true;
+      if (/\d{1,2}\/\d{1,2}\/\d{2,4}/.test(n)) return true;
+      if (letters < 4 && /\d{8,14}/.test(n)) return true;
+      if (/^\s*\d{8,14}\s*$/.test(n.trim())) return true;
+      if (n.length > 72) return true;
+      return false;
+    }
+
+    /** Grocery / retail: `ITEM 3 @ 3.00 - 3.00 = 6.00`, weight `1.85 @ 1.99 0.00 = 3.68`, or `1 @ 2.45 = 2.45` (OCR may omit $). */
+    function tryParseQtyAtPriceLine(rawLine) {
+      let line = String(rawLine).trim().replace(/\*+/g, ' ').replace(/\s+/g, ' ').replace(/\$/g, '');
+      if (!line || isSkippableLineForItems(line)) return null;
+      const withDisc = line.match(
+        /^(.+?)\s+(\d+)\s*@\s*(\d+\.\d{2})\s*-\s*(\d+\.\d{2})\s*=\s*(\d+\.\d{2})\s*$/i
+      );
+      if (withDisc) {
+        const name = withDisc[1].trim().replace(/^[\W_]+/, '');
+        const amount = parseCurrency(withDisc[5]);
+        if (
+          name.length >= 3 &&
+          amount != null &&
+          /[a-z]/i.test(name) &&
+          !isNonProductReceiptLineName(name)
+        )
+          return { name: name.slice(0, 80), amount };
+      }
+      const weightMid = line.match(
+        /^(.+?)\s+(\d+\.\d+)\s*@\s*(\d+\.\d{2})(?:\s+(\d+\.\d{2}))?\s*=\s*(\d+\.\d{2})\s*$/i
+      );
+      if (weightMid) {
+        const name = weightMid[1].trim().replace(/^[\W_]+/, '');
+        const amount = parseCurrency(weightMid[5]);
+        if (
+          name.length >= 3 &&
+          amount != null &&
+          /[a-z]/i.test(name) &&
+          !isNonProductReceiptLineName(name)
+        )
+          return { name: name.slice(0, 80), amount };
+      }
+      const simple = line.match(/^(.+?)\s+(\d+)\s*@\s*(\d+\.\d{2})\s*=\s*(\d+\.\d{2})\s*$/i);
+      if (simple) {
+        const name = simple[1].trim().replace(/^[\W_]+/, '');
+        const amount = parseCurrency(simple[4]);
+        if (
+          name.length >= 3 &&
+          amount != null &&
+          /[a-z]/i.test(name) &&
+          !isNonProductReceiptLineName(name)
+        )
+          return { name: name.slice(0, 80), amount };
+      }
+      return null;
+    }
+
+    function tryParseItemLine(rawLine) {
+      let line = String(rawLine).trim();
+      if (!line) return null;
+      line = line.replace(/\*+/g, ' ').replace(/\s+/g, ' ').trim();
+      if (isSkippableLineForItems(line)) return null;
+      if (isOcrJunkMergedLine(line)) return null;
+      if (/^INST\s*SV\b/i.test(line)) return null;
+
+      const qtyLine = tryParseQtyAtPriceLine(line);
+      if (qtyLine) return qtyLine;
+
+      const skuLead = line.match(/^(\d{6,13})\s+(.+)$/i);
+      if (skuLead) {
+        let rest = skuLead[2].replace(/\s+[0ONTA-Z]\s*$/i, '').trim();
+        if (isSkippableLineForItems(rest)) return null;
+        const prices = [...rest.matchAll(/\b(-?\d{1,3}\.\d{2})\b/g)];
+        if (!prices.length) return null;
+        const last = prices[prices.length - 1];
+        const amount = parseCurrency(last[1]);
+        if (amount == null || Math.abs(amount) > 9999) return null;
+        let name = rest.slice(0, last.index).trim().replace(/^[\W_]+/, '');
+        name = normalizeWarehouseDealSuffix(name).trim().slice(0, 80);
+        if (!name || !/[a-z]/i.test(name)) return null;
+        if (isSkippableLineForItems(name)) return null;
+        if (isNonProductReceiptLineName(name)) return null;
+        return { name, amount };
+      }
+
+      const priceMatches = [...line.matchAll(/(-?\d+\.\d{2})\b/g)];
+      if (!priceMatches.length) return null;
+      const last = priceMatches[priceMatches.length - 1];
+      const amountVal = parseCurrency(last[1]);
+      if (amountVal == null || Math.abs(amountVal) > 9999) return null;
+      let before = line.slice(0, last.index).trim();
+      before = before.replace(/^(\d{6,13})\s+/, '').trim();
+      if (!before || before.length < 2) return null;
+      if (isSkippableLineForItems(before)) return null;
+      if (/\d{1,2}\/\d{1,2}\/\d{2,4}/.test(before)) return null;
+      const name = before.replace(/^[\W_]+/, '').trim().slice(0, 80);
+      if (!/[a-zA-Z]/.test(name)) return null;
+      if (isNonProductReceiptLineName(name)) return null;
+      return { name, amount: amountVal };
+    }
+
+    function extractItemsFromRawBlob(text) {
+      const norm = String(text).replace(/\*+/g, ' ').replace(/\s+/g, ' ').trim();
+      const items = [];
+      const skuRe = /\b(0\d{8,11})\b/g;
+      const hits = [];
+      let mx;
+      while ((mx = skuRe.exec(norm)) !== null) {
+        hits.push({ sku: mx[1], idx: mx.index, after: mx.index + mx[0].length });
+      }
+      for (let i = 0; i < hits.length; i += 1) {
+        const { after } = hits[i];
+        const end = i + 1 < hits.length ? hits[i + 1].idx : norm.length;
+        let chunk = norm.slice(after, end).trim();
+        if (chunk.length > 140) chunk = chunk.slice(0, 140);
+        const priceMatches = [...chunk.matchAll(/\b(-?\d{1,3}\.\d{2})\b/g)];
+        if (!priceMatches.length) continue;
+        const lastP = priceMatches[priceMatches.length - 1];
+        const amount = parseCurrency(lastP[1]);
+        if (amount == null || amount <= 0 || Math.abs(amount) > 9999) continue;
+        let name = chunk.slice(0, lastP.index).trim().replace(/^[\W_]+/, '');
+        name = normalizeWarehouseDealSuffix(name).replace(/\s+/g, ' ').trim().slice(0, 80);
+        if (!name || name.length < 2 || !/[a-z]/i.test(name)) continue;
+        if (isSkippableLineForItems(name) || itemLooksLikePayment(name, amount)) continue;
+        if (isNonProductReceiptLineName(name)) continue;
+        const it = { name, amount };
+        if (itemLooksLikeJunkItem(it)) continue;
+        items.push(it);
+      }
+      return items;
+    }
+
+    /** Grocery-style lines without warehouse SKU: product text + price at EOL (per OCR line to reduce spurious matches). */
+    function extractGroceryBlobItems(text) {
+      const lines = String(text)
+        .split(/\n/)
+        .map((l) => l.trim().replace(/\*+/g, ' ').replace(/\s+/g, ' '))
+        .filter(Boolean);
+      const items = [];
+      const re =
+        /^(.+?)\s+(?:(?:\d+\.?\d*\s*@\s*\d+\.\d{2}(?:\s*-\s*\d+\.\d{2})?(?:\s+\d+\.\d{2})?\s*=\s*)?)(\d+\.\d{2})\s*$/i;
+      for (const line of lines) {
+        if (isSkippableLineForItems(line) || isOcrJunkMergedLine(line)) continue;
+        const m = line.match(re);
+        if (!m) continue;
+        let name = m[1].trim().replace(/^[\W\d]+/, '').replace(/^SKU\s*:?\s*\d+\s*/i, '');
+        const amount = parseCurrency(m[2]);
+        if (amount == null || amount <= 0 || amount > 4999) continue;
+        if (name.length < 4 || !/[A-Za-z]{3,}/.test(name)) continue;
+        if (isSkippableLineForItems(name) || itemLooksLikePayment(name, amount)) continue;
+        if (/^\d+\s*@/.test(name)) continue;
+        const trimmed = name.slice(0, 80);
+        if (isNonProductReceiptLineName(trimmed)) continue;
+        const it = { name: trimmed, amount };
+        if (itemLooksLikeJunkItem(it)) continue;
+        items.push(it);
+      }
+      return items;
+    }
+
+    function itemMergeKey(it) {
+      return `${String(it.name || '').trim().toLowerCase()}|${Number(it.amount).toFixed(2)}`;
+    }
+
+    /** Sam’s / warehouse: strip “2 AT 1 FOR 16.81” deal suffix from display name. */
+    function normalizeWarehouseDealSuffix(name) {
+      return String(name || '')
+        .replace(/\s+\d+\s+AT\s+\d+\s+FOR\s+[\d.]+\s*$/i, '')
+        .replace(/\s+\d+\s+AT\s+[\d.]+\s+EA\s*$/i, '')
+        .trim();
+    }
+
+    function scoreLineItemNameForDedupe(name) {
+      const n = String(name || '').toLowerCase();
+      let s = Math.min(n.replace(/\s+/g, ' ').length, 72);
+      if (/^\d+\s+at\s+\d+\s+for\b/i.test(n.trim())) s -= 35;
+      if (/\bat\s+\d+\s+for\b/i.test(n)) s -= 15;
+      if (/\b(puffer|jacket|jeans|hoodie|water|chings|noodle|onion|yogurt|milk)\b/i.test(n)) s += 40;
+      if (/\bmm\s|member|sam'?s\b/i.test(n)) s += 8;
+      return s;
+    }
+
+    /**
+     * Same product often appears twice (per-line OCR + flattened blob) under different names.
+     * Keep one row per rounded amount, preferring real product text over “2 AT 1 FOR …”.
+     */
+    function dedupeLineItemsPreferBestPerAmount(items) {
+      const list = Array.isArray(items) ? items : [];
+      const byAmt = new Map();
+      for (const it of list) {
+        const a = round2(Number(it.amount) || 0);
+        if (!Number.isFinite(a) || a <= 0) continue;
+        const cur = byAmt.get(a);
+        if (!cur) {
+          byAmt.set(a, { ...it });
+          continue;
+        }
+        const sa = scoreLineItemNameForDedupe(it.name);
+        const sb = scoreLineItemNameForDedupe(cur.name);
+        if (sa > sb) byAmt.set(a, { ...it });
+      }
+      return Array.from(byAmt.values());
+    }
+
+    /**
+     * Start from `primary` list (every row kept). Then append rows from `supplemental` only when
+     * that key appears more times in supplemental than in primary (fixes 3× same SKU without
+     * duplicating rows that exist in both scans).
+     */
+    /** “INST SV … 2.00-O” is instant savings on a prior line, not a separate product. */
+    function isInstantSavingsStubItem(item) {
+      return /^INST\s*SV\b/i.test(String(item.name || '').trim());
+    }
+
+    function findLineItemForSavingTarget(items, targetName) {
+      const t = String(targetName || '')
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      const tokens = t.split(/\s+/).filter((x) => x.length > 2);
+      for (let i = 0; i < items.length; i += 1) {
+        if (isInstantSavingsStubItem(items[i])) continue;
+        const n = items[i].name.toLowerCase();
+        if (tokens.length && tokens.every((tok) => n.includes(tok))) return i;
+      }
+      if (tokens.length) {
+        const first = tokens[0];
+        for (let i = 0; i < items.length; i += 1) {
+          if (isInstantSavingsStubItem(items[i])) continue;
+          if (items[i].name.toLowerCase().includes(first)) return i;
+        }
+      }
+      return -1;
+    }
+
+    function applyInstantSavingsToLineItems(lineItems, receiptLines) {
+      const items = lineItems.map((x) => ({ ...x }));
+      const lines = receiptLines || [];
+      const appliedSig = new Set();
+
+      const tryApplyLine = (normalized) => {
+        let m = normalized.match(/INST\s*SV\s+(.+?)\s+(\d+\.\d{2})\s*-\s*[0ONTA-Z]?$/i);
+        if (!m) m = normalized.match(/INST\s*SV\s+(.+?)\s+-\s*(\d+\.\d{2})\b/i);
+        if (!m) m = normalized.match(/INST\s*SV\s+(.+?)\s+(\d+\.\d{2})(?:\s+[0ONTA-Z])?$/i);
+        if (!m) return;
+        const targetName = m[1].trim();
+        const dollars = parseCurrency(m[2]);
+        if (!targetName || dollars == null) return;
+        const discount = -Math.abs(dollars);
+        const sig = `${targetName.toLowerCase()}|${discount}`;
+        if (appliedSig.has(sig)) return;
+        appliedSig.add(sig);
+        const idx = findLineItemForSavingTarget(items, targetName);
+        if (idx >= 0) items[idx].amount = round2(items[idx].amount + discount);
+      };
+
+      for (const line of lines) {
+        if (!/INST\s*SV/i.test(line)) continue;
+        tryApplyLine(line.replace(/\*+/g, ' ').replace(/\s+/g, ' ').trim());
+      }
+
+      const flat = lines.join(' ').replace(/\*+/g, ' ').replace(/\s+/g, ' ');
+      if (/INST\s*SV/i.test(flat)) tryApplyLine(flat);
+
+      return items.filter((it) => !isInstantSavingsStubItem(it));
+    }
+
+    function mergeItemLists(primary, supplemental) {
+      const primaryCounts = new Map();
+      for (const it of primary) {
+        const k = itemMergeKey(it);
+        primaryCounts.set(k, (primaryCounts.get(k) || 0) + 1);
+      }
+      const supplementalCounts = new Map();
+      for (const it of supplemental) {
+        const k = itemMergeKey(it);
+        supplementalCounts.set(k, (supplementalCounts.get(k) || 0) + 1);
+      }
+      const out = [...primary];
+      const extrasNeeded = new Map();
+      for (const [k, sc] of supplementalCounts) {
+        const pc = primaryCounts.get(k) || 0;
+        if (sc > pc) extrasNeeded.set(k, sc - pc);
+      }
+      for (const it of supplemental) {
+        const k = itemMergeKey(it);
+        let need = extrasNeeded.get(k) || 0;
+        if (need > 0) {
+          out.push(it);
+          need -= 1;
+          extrasNeeded.set(k, need);
+        }
+      }
+      return out;
+    }
+
+    function extractReceiptData(rawText) {
+      const text = rawText || '';
+      const lines = text.split(/\n/).map((line) => line.trim()).filter(Boolean);
+      const firstLine = lines.find(Boolean) || 'Unknown Merchant';
+      const dateMatch = text.match(/\b(?:\d{1,2}[\/-]\d{1,2}[\/-]\d{2,4}|(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\s+\d{1,2},?\s+\d{2,4})\b/i);
+
+      const fromLines = [];
+      for (const line of lines) {
+        const it = tryParseItemLine(line);
+        if (it && !itemLooksLikePayment(it.name, it.amount) && !itemLooksLikeJunkItem(it)) fromLines.push(it);
+      }
+
+      const fromBlob = extractItemsFromRawBlob(text).filter(
+        (it) => !itemLooksLikePayment(it.name, it.amount) && !itemLooksLikeJunkItem(it)
+      );
+
+      const fromGroceryBlob = extractGroceryBlobItems(text).filter(
+        (it) => !itemLooksLikePayment(it.name, it.amount) && !itemLooksLikeJunkItem(it)
+      );
+
+      const mergeThree = (a, b, c) => mergeItemLists(mergeItemLists(a, b), c);
+
+      let lineItems =
+        fromBlob.length >= 3 && fromBlob.length > fromLines.length
+          ? mergeThree(fromBlob, fromLines, fromGroceryBlob)
+          : mergeThree(fromLines, fromBlob, fromGroceryBlob);
+      lineItems = lineItems.filter(
+        (it) => !itemLooksLikePayment(it.name, it.amount) && !itemLooksLikeJunkItem(it)
+      );
+      if (lineItems.length <= 1 && fromBlob.length >= 2) {
+        lineItems = fromBlob.filter(
+          (it) => !itemLooksLikePayment(it.name, it.amount) && !itemLooksLikeJunkItem(it)
+        );
+      }
+
+      lineItems = applyInstantSavingsToLineItems(lineItems, lines);
+      lineItems = lineItems.filter((it) => !isNonProductReceiptLineName(it.name));
+      lineItems = lineItems.map((it) => ({
+        ...it,
+        name: normalizeWarehouseDealSuffix(String(it.name || ''))
+          .replace(/\s+/g, ' ')
+          .trim()
+          .slice(0, 80),
+      }));
+      lineItems = dedupeLineItemsPreferBestPerAmount(lineItems);
+
+      let detectedTotal = null;
+      let detectedTotalScore = -1;
+      const blockedWords = /(tip|suggested|percentages|before discounts|before taxes|gratuity)/i;
+
+      function scoreTotalLine(line, idx) {
+        const nums = line.match(/([0-9]+\.[0-9]{2})/g);
+        if (!nums || !nums.length) return null;
+        const parsed = nums.map((x) => parseCurrency(x)).filter((v) => v != null && v >= 0);
+        if (!parsed.length) return null;
+        const amount = Math.max(...parsed);
+        if (amount == null || amount < 0) return null;
+        const lower = line.toLowerCase().replace(/\$/g, '');
+        if (blockedWords.test(lower) || /^\s*\d+%/.test(line)) return null;
+        if (/\btax\s+total\b/i.test(lower)) return null;
+        const prev = lines[Math.max(0, idx - 1)] || '';
+        const next = lines[Math.min(lines.length - 1, idx + 1)] || '';
+        if (blockedWords.test(prev) || blockedWords.test(next)) return null;
+
+        let score = 0;
+        if (/total\s+charge|total\s+tendered|amount\s+due|balance\s+due/i.test(lower)) score = 12;
+        else if (/^sub\s*total\b|subtotal\b/i.test(lower)) score = 6;
+        else if (/(^|\s)(grand\s+)?total(\s|$)/i.test(lower)) score = 4;
+        else return null;
+
+        if (/^sub\s*total\b|subtotal\b/i.test(lower) && amount < 0.02) return null;
+        if (score <= 4 && /(^|\s)total(\s|$)/i.test(lower) && /\btax\b/i.test(lower)) return null;
+
+        if (/^sub\s*total\b|subtotal\b/i.test(line)) score += 1;
+        if (/total\s+charge|tendered/i.test(lower)) score += 3;
+        if (/^\s*(grand\s+)?total\b/i.test(line)) score += 1;
+        if (/(visa|mastercard|approved|authorization|payment id|transaction type)/i.test(`${prev} ${next}`)) score += 1;
+        return { amount, score };
+      }
+
+      for (let idx = 0; idx < lines.length; idx += 1) {
+        const res = scoreTotalLine(lines[idx], idx);
+        if (res && res.score > detectedTotalScore) {
+          detectedTotal = res.amount;
+          detectedTotalScore = res.score;
+        }
+      }
+
+      if (detectedTotal == null || detectedTotal < 0.02) {
+        const flat = text.replace(/\$/g, '');
+        const m =
+          flat.match(/total\s+charge\s+.*?(\d+\.\d{2})/i) ||
+          flat.match(/total\s+tendered\s+.*?(\d+\.\d{2})/i) ||
+          flat.match(/sub\s*total\s+.*?(\d+\.\d{2})/i);
+        if (m) {
+          const v = parseCurrency(m[1]);
+          if (v != null && v >= 0.02) detectedTotal = v;
+        }
+      }
+
+      if (detectedTotal == null || detectedTotal < 0.02) {
+        const cleanTotalLine = lines.find((line) => {
+          const low = line.toLowerCase();
+          return (
+            /(^|\s)(grand\s+)?total(\s|$)/i.test(line) &&
+            !/\btax\s+total\b/i.test(low) &&
+            !blockedWords.test(line) &&
+            !/^\s*\d+%/.test(line)
+          );
+        });
+        if (cleanTotalLine) {
+          const nums = cleanTotalLine.match(/([0-9]+\.[0-9]{2})/g);
+          if (nums && nums.length) {
+            const last = parseCurrency(nums[nums.length - 1]);
+            if (last != null && last >= 0.02) detectedTotal = last;
+          }
+        }
+      }
+
+      const lineSum = round2(lineItems.reduce((a, it) => a + (Number(it.amount) || 0), 0));
+      if (
+        (detectedTotal == null || detectedTotal < 0.02) &&
+        lineSum >= 0.02 &&
+        lineItems.length > 0
+      ) {
+        detectedTotal = lineSum;
+      }
+
+      detectedTotal = auditGrandTotalFromRawText(text, lineSum, detectedTotal);
+
+      lineItems = lineItems.filter((it) => {
+        const nm = String(it.name || '').toLowerCase().replace(/\$/g, '').trim();
+        if (/^tax\s*total\b|^dd\s*tax\s*total|tax\s+total\s*$/.test(nm)) return false;
+        if (/\btax\s+total\b/.test(nm) && Math.abs(Number(it.amount) || 0) < 0.02) return false;
+        return true;
+      });
+
+      lineItems = normalizeEcommerceLineItems(lineItems, text, detectedTotal);
+
+      return {
+        merchant: firstLine.slice(0, 80),
+        amount: detectedTotal,
+        date: dateMatch ? dateMatch[0] : null,
+        lineItems,
+      };
+    }
+
+    function guessCategory(rawText, merchant, amount, lineItems) {
+      const blob = `${rawText || ''} ${merchant || ''}`.toLowerCase();
+      const rules = [
+        { category: 'Food & Dining', tests: ['restaurant', 'cafe', 'coffee', 'pizza', 'burger', 'uber eats', 'doordash', 'grubhub', 'grocery', 'groc', 'market', 'food', 'naan', 'paneer', 'biryani', 'dining', 'bikanervala', 'indian', 'schez', 'manchurian', 'noodle', 'dahi', 'yogurt', 'hing', 'chana', 'vermicelli', 'drumstick', 'cholia', 'sattu', 'papaya', 'onion', 'chilli', 'chili', 'flour', 'gram ', 'lb ', 'outlet', 'mm water', 'bottled water', 'spring water'] },
+        { category: 'Transportation', tests: ['uber', 'lyft', 'taxi', 'transit', 'metro', 'bus', 'train', 'fuel', 'gas station', 'shell', 'chevron', 'exxon'] },
+        { category: 'Bills & Utilities', tests: ['rent', 'electric', 'water', 'internet', 'phone', 'utility', 'power', 'comcast', 'verizon', 'at&t', 't-mobile'] },
+        { category: 'Entertainment', tests: ['cinema', 'movie', 'netflix', 'spotify', 'hulu', 'steam', 'arcade', 'concert', 'ticket'] },
+        { category: 'Clothing & Apparel', tests: ['sweatpant', 'sweat pant', 'bootcut', 'jogger', 'hoodie', 'sweater', 'jeans', 'denim', 'apparel', 'clothing', 't-shirt', 'tshirt', 'levi', 'under arm', 'newport', 'express', '511', 'puffer', 'menspuffer', 'jacket'] },
+        { category: 'Shopping', tests: ['amazon', 'walmart', 'target', 'mall', 'sams club', "sam's", 'purchase', 'shop'] }
+      ];
+      const itemBlob = (lineItems || []).map(item => `${item.name} ${item.amount}`).join(' ').toLowerCase();
+      const fullBlob = `${blob} ${itemBlob}`;
+      for (const rule of rules) {
+        if (rule.tests.some(test => fullBlob.includes(test))) return rule.category;
+      }
+      const inferred = inferReceiptProductCategory(fullBlob);
+      if (inferred) return inferred;
+      if (amount != null && amount >= 250) return 'Bills & Utilities';
+      return 'Other';
+    }
+
+    function extractTaxAmount(ocrText) {
+      if (!ocrText) return null;
+      const lines = String(ocrText).split(/\n/);
+      let sum = 0;
+      for (const line of lines) {
+        const l = line.trim();
+        const low = l.toLowerCase();
+        if (!/tax/.test(low)) continue;
+        if (/subtotal|taxable sales|total\s*[:#]|grand\s*total|^total\b|change|amount due/i.test(low)) continue;
+        const m = l.match(/([0-9]+\.[0-9]{2})\s*$/);
+        if (m) {
+          const v = Number(m[1]);
+          if (Number.isFinite(v) && v >= 0 && v < 500) sum += v;
+        }
+      }
+      return sum > 0 ? round2(sum) : null;
+    }
+
+    /**
+     * NLP-style signals over the full OCR blob (product titles often sit outside parsed line names).
+     */
+    function inferReceiptProductCategory(ocrText) {
+      const t = String(ocrText || '').toLowerCase().replace(/\s+/g, ' ');
+      if (!t) return null;
+      if (
+        /\b(sweatpants?|sweat\s*pants?|bootcut|jogger|hoodie|sweatshirt|leggings?|athleisure|wide\s*-?\s*leg|\bbaggy\b|cardigan|blazer|parka|windbreaker|bodysuit|romper|jumpsuit|beanie|tank\s*top|crop\s*top|cargos?|chinos?|khakis?|flannel|thermal|base\s*layer|knitwear|peacoat|anorak|tracksuit|loungewear|puffer|menspuffer)\b/.test(
+          t
+        )
+      )
+        return 'Clothing & Apparel';
+      if (
+        /\blevi|levi'?s|under arm|under armou|under armour|denim|apparel|clothing|t-?shirt|polo\s+shirt|\bjacket\b|fleece|blouse|\bdress\b|sneaker|footwear|\btee\b|\bsocks?\b|lingerie|\bbras?\b|oxford\s+shirt|midi\s+skirt|maxi\s+dress|mens\s*puff/.test(t)
+      )
+        return 'Clothing & Apparel';
+      if (
+        /\bgroc|grocery|indian|schez|manchurian|noodle|dahi|yogurt|hing|asafoetida|chana|vermicelli|drumstick|cholia|sattu|papaya|onion|chilli|chili|flour|naan|paneer|biryani|\boz\b|\blb\b|produce|organic|\beggs?\b|bread\b|\bfruit\b|whole milk|\bmilk\b|dragon|casfarm|cottage|cheese|\bveg|vegetable|mix veg|\bmm\s+water|bottled\s+water|spring\s+water|drinking\s+water/.test(
+          t
+        )
+      )
+        return 'Food & Dining';
+      return null;
+    }
+
+    function looksLikeEcommerceOrderConfirmation(ocrText) {
+      const t = String(ocrText || '').toLowerCase();
+      let hits = 0;
+      if (/order\s+summary/.test(t)) hits += 1;
+      if (/ready\s+for\s+pickup/.test(t)) hits += 1;
+      if (/estimated\s+sales\s+tax/.test(t)) hits += 1;
+      if (/shipping\s*(and|&)?\s*handling/.test(t)) hits += 1;
+      if (hits >= 2) return true;
+      if (hits >= 1 && /\bsku\s*:/i.test(ocrText || '')) return true;
+      return false;
+    }
+
+    function isOrderFlowSummaryName(rawName) {
+      const n = String(rawName || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      if (!n) return true;
+      if (/^price\s*:?\s*$/i.test(n)) return true;
+      if (/^(grand\s+)?(order\s+)?total$/i.test(n)) return true;
+      if (/^subtotal$/i.test(n)) return true;
+      if (/shipping\s*(and|&)?\s*handling/i.test(n)) return true;
+      if (/estimated\s+sales\s+tax|^sales\s+tax$|^tax$/i.test(n)) return true;
+      if (/order\s+summary/i.test(n)) return true;
+      if (/^ready\s+for\s+pickup$/i.test(n)) return true;
+      if (/\|\s*color:/i.test(n)) return true;
+      if (/\b(color|size):\s*[a-z0-9]/i.test(n) && /\bprice\s*:/i.test(n)) return true;
+      return false;
+    }
+
+    /** Pull a human product title from noisy e-commerce OCR (e.g. before SKU / Order Summary). */
+    function extractLikelyProductTitle(ocrText) {
+      const t = String(ocrText || '').replace(/\s+/g, ' ').trim();
+      if (!t) return null;
+      let m = t.match(
+        /([A-Za-z][A-Za-z0-9'`’\-\s]{2,60}?(?:sweatpants?|sweat\s*pants?|bootcut|jogger|hoodie|jeans?|leggings?|sneakers?|dress|blouse|t-?shirt|cardigan|shorts?|pullover|sweatshirt|windbreaker|jacket|fleece|tracksuit))\b/i
+      );
+      if (m) return m[1].replace(/\s+/g, ' ').trim().slice(0, 80);
+      m = t.match(/\bSKU\s*:/i);
+      if (m && m.index != null) {
+        const before = t.slice(0, m.index).replace(/\[[^\]]*\]/g, ' ').trim();
+        const chunk = before.replace(/^.*?\b(pickup|order)\b/i, ' ').trim();
+        const cap = chunk.match(/([A-Z][a-z]+(?:\s+[a-z]+){0,8})/);
+        if (cap && cap[1].length > 5) return cap[1].trim().slice(0, 80);
+      }
+      return null;
+    }
+
+    function normalizeEcommerceLineItems(lineItems, ocrText, grandTotal) {
+      const items = Array.isArray(lineItems) ? lineItems : [];
+      if (!items.length || !looksLikeEcommerceOrderConfirmation(ocrText)) return items;
+      const title = extractLikelyProductTitle(ocrText);
+      const hint = inferReceiptProductCategory(ocrText);
+      if (!title || !hint || grandTotal == null || !Number.isFinite(grandTotal) || grandTotal <= 0) return items;
+      const sum = round2(items.reduce((a, x) => a + Math.abs(Number(x.amount) || 0), 0));
+      if (sum <= grandTotal + 0.5) return items;
+      return [{ name: title, amount: round2(grandTotal) }];
+    }
+
+    /** Per–line-item category from product text (warehouse receipts, OCR typos). */
+    function guessLineItemCategory(rawName, ocrContext) {
+      const n = String(rawName || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      if (!n) return 'Other';
+
+      if (
+        /\blevi|levi'?s|under arm|under armou|under armour|newport|\bjgr\b|njgr|jogger|sweatpant|sweat\s*pants?|bootcut|hoodie|denim|\b511\b|athletic|carg(o|os)|fleece|\btee\b|polo\b|sneaker|footwear|sock(s)?\b|jacket|blouse|\bdress\b|leggings?|sweatshirt|tracksuit|windbreaker|pullover|\bbaggy\b|puffer|mens\s*puff|menspuffer/i.test(
+          n
+        )
+      )
+        return 'Clothing & Apparel';
+      if (/\bexpress\b/.test(n) && /\bpan\b/.test(n)) return 'Clothing & Apparel';
+      if (/\bpant(s)?\b/.test(n) && !/\bpapaya\b/.test(n)) return 'Clothing & Apparel';
+
+      if (
+        /\bpapaya\b|whole milk|\bmilk\b|dragon\s*fruit|dragonfruit|\bveg|vegetable|mix veg|casfarm|cottage|cheese|produce|organic|yogurt|\beggs?\b|bread\b|\bfruit\b|noodle|schez|manchurian|dahi|hing|chana|vermicelli|drumstick|cholia|sattu|onion|chilli|chili|flour|naan|paneer|biryani|groc|indian|\broasted\s+(chana|vermicelli)|\bgram\b|lb\b|\boz\b|\bmm\s*water\b|bottled\s+water|spring\s+water|drinking\s+water|\bwater\b/i.test(
+          n
+        )
+      )
+        return 'Food & Dining';
+
+      if (/sanitiz|hand\s*san|mm hand|\bh\s*s\b/i.test(n)) return 'Other';
+
+      if (/fuel|gas\b|\buber\b|\blyft\b/i.test(n)) return 'Transportation';
+      if (/movie|netflix|spotify|cinema/i.test(n)) return 'Entertainment';
+      if (/amazon|walmart|target|sams|sam'?s club/i.test(n)) return 'Shopping';
+
+      const blobCat = ocrContext ? inferReceiptProductCategory(ocrContext) : null;
+      if (blobCat && isOrderFlowSummaryName(rawName)) return blobCat;
+      if (
+        blobCat === 'Food & Dining' &&
+        ocrContext &&
+        /\bgroc|grocery|indian|noodle|papaya|dahi|yogurt|outlet|produce\b|mm\s+water|sam'?s|sams\b|bottled\s+water/i.test(String(ocrContext))
+      ) {
+        const letters = (n.match(/[a-z]/gi) || []).length;
+        if (letters > 0 && letters < 8 && !/\b(total|tax|sub|visa|credit|debit|tend)\b/i.test(n)) return blobCat;
+      }
+
+      return 'Other';
+    }
+
+    /** Collapse to the three buckets users care about on mixed receipts (clothes / food / other). */
+    function collapseSplitsToThreeBuckets(splits) {
+      const acc = {
+        'Clothing & Apparel': 0,
+        'Food & Dining': 0,
+        'Other': 0,
+      };
+      for (const s of splits) {
+        const a = Number(s.amount) || 0;
+        if (s.category === 'Clothing & Apparel') acc['Clothing & Apparel'] += a;
+        else if (s.category === 'Food & Dining') acc['Food & Dining'] += a;
+        else acc['Other'] += a;
+      }
+      return ['Clothing & Apparel', 'Food & Dining', 'Other']
+        .map((category) => ({ category, amount: round2(acc[category]) }))
+        .filter((r) => Math.abs(r.amount) > 0.001);
+    }
+
+    function distributeTaxToCategories(splits, taxAmount, lineMeta) {
+      if (!taxAmount || taxAmount <= 0) return splits.map((s) => ({ ...s }));
+
+      const taxableLines = lineMeta.filter((m) => m.taxLikely);
+      if (taxableLines.length === 1) {
+        const cat = taxableLines[0].category;
+        return splits.map((s) =>
+          s.category === cat
+            ? { category: s.category, amount: round2(s.amount + taxAmount) }
+            : { ...s }
+        );
+      }
+
+      const sub = splits.reduce((a, s) => a + s.amount, 0);
+      if (sub <= 0) return splits.map((s) => ({ ...s }));
+      return splits.map((s) => ({
+        category: s.category,
+        amount: round2(s.amount + taxAmount * (s.amount / sub)),
+      }));
+    }
+
+    function buildSplitsFromLineItems(lineItems, ocrText, grandTotal) {
+      const taxRaw = extractTaxAmount(ocrText);
+      const lineMeta = [];
+
+      for (const item of lineItems) {
+        const nm = (item.name || '').trim();
+        if (!nm || /^tax\b|subtotal|^total\b/i.test(nm) || isNonProductReceiptLineName(nm)) continue;
+        const cat = guessLineItemCategory(nm, ocrText);
+        const taxLikely = /sanitiz|hand\s*san|mm hand/i.test(nm.toLowerCase());
+        lineMeta.push({ name: nm, amount: item.amount, category: cat, taxLikely });
+      }
+
+      const bucket = {};
+      for (const m of lineMeta) {
+        if (!Number.isFinite(m.amount)) continue;
+        bucket[m.category] = (bucket[m.category] || 0) + m.amount;
+      }
+
+      let splits = Object.entries(bucket)
+        .map(([category, amount]) => ({ category, amount: round2(amount) }))
+        .filter((s) => s.amount !== 0);
+
+      if (taxRaw != null && splits.length) {
+        splits = distributeTaxToCategories(splits, taxRaw, lineMeta);
+      }
+
+      if (grandTotal != null && Number.isFinite(grandTotal)) {
+        const sumS = round2(splits.reduce((a, s) => a + s.amount, 0));
+        const diff = round2(grandTotal - sumS);
+        if (Math.abs(diff) >= 0.02) {
+          const wSum = splits.reduce((a, s) => a + Math.abs(Number(s.amount) || 0), 0);
+          if (wSum > 0) {
+            splits = splits.map((s) => {
+              const w = Math.abs(Number(s.amount) || 0);
+              const share = diff * (w / wSum);
+              return { category: s.category, amount: round2(Number(s.amount) + share) };
+            });
+          } else {
+            const idx = splits.findIndex((s) => s.category === 'Other');
+            if (idx >= 0) splits[idx].amount = round2(splits[idx].amount + diff);
+            else splits.push({ category: 'Other', amount: diff });
+          }
+        }
+      }
+
+      splits = splits.filter((s) => Math.abs(s.amount) > 0.001);
+      if (splits.length === 0 && grandTotal != null && grandTotal > 0) {
+        splits = [{ category: 'Other', amount: round2(grandTotal) }];
+      }
+      splits = collapseSplitsToThreeBuckets(splits);
+      return { splits, lineMeta, taxAmount: taxRaw };
+    }
+
+    function categorySelectHtml(selected) {
+      return RECEIPT_CATEGORIES.map((cat) =>
+        `<option value="${escAttr(cat)}"${cat === selected ? ' selected' : ''}>${escHtml(cat)}</option>`
+      ).join('');
+    }
+
+    function renderSplitRowsHtml(splits) {
+      return splits
+        .map(
+          (s) => `
+        <div class="split-row">
+          <select class="ocr-split-cat ocr-edit-select">${categorySelectHtml(s.category)}</select>
+          <input class="ocr-split-amt ocr-edit-input" type="number" min="0" step="0.01" value="${Number(s.amount).toFixed(2)}" />
+        </div>`
+        )
+        .join('');
+    }
+
+    function readSplitRowsFromDom() {
+      const rows = document.querySelectorAll('#split-rows-container .split-row');
+      const map = {};
+      rows.forEach((row) => {
+        const sel = row.querySelector('.ocr-split-cat');
+        const inp = row.querySelector('.ocr-split-amt');
+        if (!sel || !inp) return;
+        const cat = sel.value || 'Other';
+        const amt = Number(String(inp.value || '').trim());
+        if (!Number.isFinite(amt) || amt <= 0) return;
+        map[cat] = (map[cat] || 0) + amt;
+      });
+      return Object.entries(map).map(([category, amount]) => ({ category, amount: round2(amount) }));
+    }
+
+    function saveReceiptDraft(draft) {
+      const splits = Array.isArray(draft.splits) ? draft.splits : [];
+      const totalFromSplits = splits.reduce((a, s) => a + Number(s.amount || 0), 0);
+      const amount =
+        splits.length > 0 ? round2(totalFromSplits) : round2(Number(draft.amount || 0));
+
+      const receipts = JSON.parse(localStorage.getItem(RECEIPTS_STORAGE_KEY) || '[]');
+      const item = {
+        id: Date.now(),
+        fileName: draft.fileName,
+        uploadedAt: new Date().toISOString(),
+        ocrText: draft.ocrText,
+        merchant: draft.merchant,
+        amount,
+        receiptDate: draft.receiptDate,
+        category: splits.length === 1 ? splits[0].category : 'Mixed',
+        splits: splits.length ? splits : null,
+        lineItems: Array.isArray(draft.lineItems) ? draft.lineItems : [],
+      };
+      receipts.unshift(item);
+      localStorage.setItem(RECEIPTS_STORAGE_KEY, JSON.stringify(receipts));
+      return item;
+    }
+
+    function commitDetectedReceipt() {
+      if (!pendingReceiptDraft) return;
+      const merchantInput = document.getElementById('detected-merchant');
+      const dateInput = document.getElementById('detected-date');
+      const splits = readSplitRowsFromDom();
+      const total = splits.reduce((a, s) => a + s.amount, 0);
+      if (!splits.length || !Number.isFinite(total) || total <= 0) {
+        alert('Add at least one category with a positive amount.');
+        return;
+      }
+
+      pendingReceiptDraft.splits = splits;
+      pendingReceiptDraft.amount = round2(total);
+      pendingReceiptDraft.merchant = (merchantInput && merchantInput.value ? merchantInput.value : 'Unknown Merchant').trim();
+      pendingReceiptDraft.receiptDate = (dateInput && dateInput.value ? dateInput.value : '').trim() || null;
+      pendingReceiptDraft.category = splits.length === 1 ? splits[0].category : 'Mixed';
+
+      saveReceiptDraft(pendingReceiptDraft);
+      window.location.href = 'MainBudget.html';
+    }
+
+    async function runLocalOCR(file, ocrOptions) {
+      if (!window.Tesseract || typeof window.Tesseract.recognize !== 'function') {
+        throw new Error('Local OCR library failed to load. Please refresh and try again.');
+      }
+      const opts = ocrOptions && typeof ocrOptions === 'object' ? ocrOptions : {};
+      const result = await window.Tesseract.recognize(file, 'eng', opts);
+      return result && result.data && result.data.text ? result.data.text : '';
+    }
+
+    async function runOCR(file) {
+      const ocrFile = await prepareFileForOCR(file);
+      const preBlob = await preprocessReceiptImageForOCR(ocrFile);
+      const preFile = preBlob ? new File([preBlob], 'receipt-ocr-pre.png', { type: 'image/png' }) : null;
+
+      const [tPsm6, tPsm4, tRaw] = await Promise.all([
+        preFile ? runLocalOCR(preFile, { tessedit_pageseg_mode: 6 }) : Promise.resolve(''),
+        preFile ? runLocalOCR(preFile, { tessedit_pageseg_mode: 4 }) : Promise.resolve(''),
+        runLocalOCR(ocrFile, { tessedit_pageseg_mode: 6 }),
+      ]);
+
+      let merged = tPsm6;
+      let mergedScore = scoreOcrTextQuality(merged);
+      merged = mergeOcrTexts(merged, tPsm4);
+      mergedScore = scoreOcrTextQuality(merged);
+      const alt = mergeOcrTexts(tRaw, tPsm6);
+      if (scoreOcrTextQuality(alt) > mergedScore * 0.95) merged = mergeOcrTexts(merged, tRaw);
+      else if (scoreOcrTextQuality(tRaw) > mergedScore) merged = tRaw;
+
+      const text = merged.trim() || tRaw.trim() || tPsm6.trim() || tPsm4.trim();
+      const provider = preFile
+        ? 'Local OCR (Tesseract — sharpened image + multi-pass)'
+        : 'Local OCR (Tesseract)';
+      return { text, provider };
+    }
+
+    async function showFile(file) {
+      reviewRoot.innerHTML = '';
+      label.innerHTML = `
+        <p class="file-name">${escHtml(file.name)}</p>
+        <span class="file-ok">Scanning receipt text...</span>
+      `;
+
+      try {
+        const ocrResult = await runOCR(file);
+        const ocrText = ocrResult.text || '';
+        const parsed = extractReceiptData(ocrText);
+        const { splits, lineMeta, taxAmount } = buildSplitsFromLineItems(
+          parsed.lineItems || [],
+          ocrText,
+          parsed.amount
+        );
+        const guessedCategory = guessCategory(ocrText, parsed.merchant, parsed.amount, parsed.lineItems);
+        pendingReceiptDraft = {
+          fileName: file.name,
+          ocrText,
+          merchant: parsed.merchant,
+          amount: parsed.amount,
+          receiptDate: parsed.date,
+          category: splits.length === 1 ? splits[0].category : guessedCategory,
+          lineItems: parsed.lineItems,
+          splits,
+          lineMeta,
+        };
+        const snippet = escHtml((ocrText || 'No text detected.').replace(/\s+/g, ' ').slice(0, 200));
+        const lineItemsMarkup =
+          (parsed.lineItems || []).length > 0
+            ? `<ul class="line-items-list">${parsed.lineItems
+                .map((item) => {
+                  const cat = guessLineItemCategory(item.name, ocrText);
+                  return `
+              <li>
+                <span class="line-item-name">${escHtml(item.name)}</span>
+                <span class="line-item-cat">${escHtml(cat)}</span>
+                <span class="line-item-price">${escHtml(formatCurrency(item.amount))}</span>
+              </li>`;
+                })
+                .join('')}</ul>`
+            : '<p>No line-item rows detected — totals only. Adjust categories below.</p>';
+        const taxNote =
+          taxAmount != null
+            ? `<p style="margin-top:0.5rem;font-size:0.72rem;color:#4b5563;">Tax detected: <strong>${escHtml(formatCurrency(taxAmount))}</strong> — added to the category that likely owed it (e.g. taxable items), or split by subtotal if unclear.</p>`
+            : '';
+        const splitRowsHtml =
+          splits.length > 0
+            ? renderSplitRowsHtml(splits)
+            : `<div class="split-row">
+            <select class="ocr-split-cat ocr-edit-select">${categorySelectHtml(guessedCategory)}</select>
+            <input class="ocr-split-amt ocr-edit-input" type="number" min="0" step="0.01" value="${parsed.amount != null ? parsed.amount.toFixed(2) : ''}" />
+          </div>`;
+
+        label.innerHTML = `
+          <p class="file-name">${escHtml(file.name)}</p>
+          <span class="file-ok">${escHtml(ocrResult.provider)} OCR complete ✓</span>
+        `;
+        reviewRoot.innerHTML = `
+          <div class="ocr-preview">
+            <p><strong>Review receipt before committing:</strong></p>
+            <p style="font-size:0.72rem;color:#6b7280;margin-bottom:0.5rem;">Totals are rolled into <strong>Clothing</strong>, <strong>Food</strong>, and <strong>Other</strong> (e.g. sanitizer, tax). Edit any row before commit.</p>
+            <div class="ocr-edit-row">
+              <input id="detected-merchant" class="ocr-edit-input" type="text" value="${escAttr(parsed.merchant || 'Unknown Merchant')}" placeholder="Merchant" />
+              <input id="detected-date" class="ocr-edit-input" type="text" value="${escAttr(parsed.date || '')}" placeholder="Receipt date" />
+            </div>
+            <div class="detected-amount-box">
+              <div class="detected-amount-label">Receipt total (from OCR)</div>
+              <div class="detected-amount-value">${escHtml(formatCurrency(parsed.amount))}</div>
+            </div>
+            ${taxNote}
+            <p class="split-section-title">Totals by category (clothing / food / other)</p>
+            <div id="split-rows-container">${splitRowsHtml}</div>
+            <div class="line-items">
+              <p><strong>Line items & guessed categories:</strong></p>
+              ${lineItemsMarkup}
+            </div>
+            <p><strong>Extracted text:</strong> ${snippet}${snippet.length >= 200 ? '...' : ''}</p>
+            <button type="button" class="continue-btn" onclick="commitDetectedReceipt()">Commit receipt &amp; update budget</button>
+          </div>
+        `;
+      } catch (err) {
+        reviewRoot.innerHTML = '';
+        label.innerHTML = `
+          <p class="file-name">${escHtml(file.name)}</p>
+          <span class="file-error">OCR failed: ${escHtml(err.message || 'Unknown error')}</span>
+          <span class="file-ok">Tip: Refresh once and retry. Local OCR should work without any API key.</span>
+        `;
+      }
+    }
+
+    function onDragOver(e) {
+      e.preventDefault();
+      zone.classList.add('dragging');
+    }
+
+    function onDragLeave(e) {
+      e.preventDefault();
+      zone.classList.remove('dragging');
+    }
+
+    function onDrop(e) {
+      e.preventDefault();
+      zone.classList.remove('dragging');
+      const file = e.dataTransfer.files[0];
+      if (file) void showFile(file);
+    }
+
+    function onFileChange(e) {
+      const file = e.target.files[0];
+      if (file) void showFile(file);
+    }
+
+    function triggerCamera() {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment';
+      input.onchange = e => { if (e.target.files[0]) void showFile(e.target.files[0]); };
+      input.click();
+    }
+
+  </script>
+</body>
+</html>

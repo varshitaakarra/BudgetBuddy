@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BudgetBuddy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      :root {
+        --primary: hsl(265, 84%, 48%);
+        --primary-foreground: hsl(210, 40%, 98%);
+        --radius: 0.875rem;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(
+          135deg,
+          #f9a8d4 0%,
+          #e9d5ff 50%,
+          #bfdbfe 100%
+        );
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Decorative emojis */
+      .emoji {
+        position: absolute;
+        opacity: 0.7;
+        font-style: normal;
+        user-select: none;
+        pointer-events: none;
+      }
+      .emoji-flower-top {
+        top: 1.5rem;
+        right: 1.5rem;
+        font-size: 2.5rem;
+      }
+      .emoji-tulip-bottom {
+        bottom: 2.5rem;
+        left: 1.5rem;
+        font-size: 2rem;
+      }
+      .emoji-daisy-left {
+        top: 6rem;
+        left: 2rem;
+        font-size: 1.75rem;
+      }
+      .emoji-butterfly {
+        bottom: 6rem;
+        right: 2rem;
+        font-size: 2rem;
+      }
+
+      @media (min-width: 640px) {
+        .emoji-flower-top {
+          top: 2rem;
+          right: 2rem;
+          font-size: 3rem;
+        }
+        .emoji-tulip-bottom {
+          bottom: 4rem;
+          left: 2rem;
+          font-size: 2.5rem;
+        }
+        .emoji-daisy-left {
+          top: 8rem;
+          left: 3rem;
+          font-size: 2rem;
+        }
+        .emoji-butterfly {
+          bottom: 8rem;
+          right: 3rem;
+          font-size: 2.5rem;
+        }
+      }
+
+      /* Card */
+      .card-wrapper {
+        width: 100%;
+        max-width: 28rem;
+        margin: 0 1rem;
+      }
+
+      @media (min-width: 640px) {
+        .card-wrapper {
+          margin: 0 1.5rem;
+        }
+      }
+
+      .card {
+        background: #ffffff;
+        border-radius: 1rem;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+      }
+
+      /* Header */
+      .card-header {
+        padding: 2rem 1.5rem 1.5rem;
+        text-align: center;
+      }
+
+      @media (min-width: 640px) {
+        .card-header {
+          padding: 2.5rem 2rem 2rem;
+        }
+      }
+
+      .logo-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 0.875rem;
+        background: var(--primary);
+        margin-bottom: 1.5rem;
+      }
+
+      @media (min-width: 640px) {
+        .logo-icon {
+          width: 5rem;
+          height: 5rem;
+        }
+      }
+
+      .logo-icon svg {
+        width: 2rem;
+        height: 2rem;
+      }
+
+      @media (min-width: 640px) {
+        .logo-icon svg {
+          width: 2.5rem;
+          height: 2.5rem;
+        }
+      }
+
+      h1 {
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #111827;
+        margin-bottom: 0.75rem;
+      }
+
+      @media (min-width: 640px) {
+        h1 {
+          font-size: 2.25rem;
+        }
+      }
+
+      .tagline {
+        font-size: 0.875rem;
+        color: #4b5563;
+      }
+
+      @media (min-width: 640px) {
+        .tagline {
+          font-size: 1rem;
+        }
+      }
+
+      /* Form section */
+      .card-body {
+        padding: 2rem 1.5rem;
+      }
+
+      @media (min-width: 640px) {
+        .card-body {
+          padding: 2rem;
+        }
+      }
+
+      /* Tab toggle */
+      .tab-list {
+        display: flex;
+        gap: 0.25rem;
+        background: #f3f4f6;
+        border-radius: 0.75rem;
+        padding: 0.25rem;
+        margin-bottom: 2rem;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: inherit;
+        color: #4b5563;
+        background: transparent;
+      }
+
+      .tab-btn:hover {
+        color: #111827;
+      }
+
+      .tab-btn.active {
+        background: #ffffff;
+        color: #111827;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+      }
+
+      /* Form */
+      .form-group {
+        margin-bottom: 1.5rem;
+      }
+
+      label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #111827;
+        margin-bottom: 0.5rem;
+      }
+
+      input[type="text"],
+      input[type="password"],
+      input[type="email"] {
+        width: 100%;
+        padding: 0.5rem 0.75rem;
+        background: #f3f4f6;
+        border: 1px solid transparent;
+        border-radius: 0.5rem;
+        font-size: 0.9rem;
+        color: #111827;
+        font-family: inherit;
+        outline: none;
+        transition: all 0.2s;
+      }
+
+      @media (min-width: 640px) {
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+          padding: 0.75rem;
+        }
+      }
+
+      input::placeholder {
+        color: #6b7280;
+      }
+
+      input:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px hsla(265, 84%, 48%, 0.15);
+      }
+
+      /* Checkbox row */
+      .checkbox-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+      }
+
+      input[type="checkbox"] {
+        width: 1rem;
+        height: 1rem;
+        border-radius: 0.25rem;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        accent-color: var(--primary);
+      }
+
+      .checkbox-row label {
+        margin-bottom: 0;
+        cursor: pointer;
+        font-weight: 400;
+      }
+
+      /* Submit button */
+      .submit-btn {
+        width: 100%;
+        background: #111827;
+        color: #ffffff;
+        font-weight: 500;
+        padding: 0.625rem 1rem;
+        border-radius: 0.5rem;
+        border: none;
+        cursor: pointer;
+        font-family: inherit;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: background 0.2s;
+      }
+
+      @media (min-width: 640px) {
+        .submit-btn {
+          padding: 0.75rem 1rem;
+        }
+      }
+
+      .submit-btn:hover {
+        background: #000000;
+      }
+
+      .submit-btn:hover .btn-icon {
+        transform: translateX(2px);
+      }
+
+      .btn-icon {
+        transition: transform 0.2s;
+      }
+
+      /* Card footer */
+      .card-footer {
+        padding: 1.5rem;
+        text-align: center;
+        border-top: 1px solid #f3f4f6;
+      }
+
+      @media (min-width: 640px) {
+        .card-footer {
+          padding: 1.5rem 2rem;
+        }
+      }
+
+      .card-footer p {
+        font-size: 0.875rem;
+        color: #4b5563;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Decorative emojis -->
+    <span class="emoji emoji-flower-top">🌸</span>
+    <span class="emoji emoji-tulip-bottom">🌷</span>
+    <span class="emoji emoji-daisy-left">🌼</span>
+    <span class="emoji emoji-butterfly">🦋</span>
+
+    <!-- Main card -->
+    <div class="card-wrapper">
+      <div class="card">
+        <!-- Header -->
+        <div class="card-header">
+          <div class="logo-icon">
+            <svg
+              viewBox="0 0 40 40"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M20 3.33333V36.6667"
+                stroke="white"
+                stroke-width="3.33333"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+              <path
+                d="M28.3333 8.33334H15.8333C14.2862 8.33334 12.8025 8.94792 11.7085 10.0419C10.6146 11.1358 10 12.6196 10 14.1667C10 15.7138 10.6146 17.1975 11.7085 18.2915C12.8025 19.3854 14.2862 20 15.8333 20H24.1667C25.7138 20 27.1975 20.6146 28.2915 21.7085C29.3854 22.8025 30 24.2862 30 25.8333C30 27.3804 29.3854 28.8642 28.2915 29.9581C27.1975 31.0521 25.7138 31.6667 24.1667 31.6667H10"
+                stroke="white"
+                stroke-width="3.33333"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <h1>BudgetBuddy</h1>
+          <p class="tagline">Smart budgeting for your college life</p>
+        </div>
+
+        <!-- Form body -->
+        <div class="card-body">
+          <!-- Tab toggle -->
+          <div class="tab-list" role="tablist">
+            <button
+              class="tab-btn active"
+              id="tab-signin"
+              role="tab"
+              onclick="switchTab('signin')"
+            >
+              Sign In
+            </button>
+            <button
+              class="tab-btn"
+              id="tab-signup"
+              role="tab"
+              onclick="switchTab('signup')"
+            >
+              Sign Up
+            </button>
+          </div>
+
+          <!-- Sign In form -->
+          <div id="form-signin">
+            <form onsubmit="handleSubmit(event, 'signin')">
+              <div class="form-group">
+                <label for="signin-username">Email</label>
+                <input
+                  id="signin-username"
+                  type="text"
+                  placeholder="Enter your email"
+                  autocomplete="username"
+                />
+              </div>
+              <div class="form-group">
+                <label for="signin-password">Password</label>
+                <input
+                  id="signin-password"
+                  type="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                />
+              </div>
+              <div class="checkbox-row">
+                <input id="remember" type="checkbox" />
+                <label for="remember">Remember me</label>
+              </div>
+
+              <p
+                id="signin-message"
+                style="margin-bottom: 10px; display: none; font-size: 14px"
+              ></p>
+              <button type="submit" class="submit-btn">
+                <svg
+                  class="btn-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9.9989 1.99979H12.6653C13.0189 1.99979 13.358 2.14025 13.608 2.39027C13.858 2.64029 13.9985 2.97939 13.9985 3.33298V12.6653C13.9985 13.0189 13.858 13.358 13.608 13.608C13.358 13.858 13.0189 13.9985 12.6653 13.9985H9.9989"
+                    stroke="white"
+                    stroke-width="1.33319"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M6.66595 11.3321L9.99893 7.99914L6.66595 4.66617"
+                    stroke="white"
+                    stroke-width="1.33319"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M9.99892 7.99915H1.99979"
+                    stroke="white"
+                    stroke-width="1.33319"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span>Sign In</span>
+              </button>
+            </form>
+          </div>
+
+          <!-- Sign Up form -->
+          <div id="form-signup" style="display: none">
+            <form onsubmit="return handleSubmit(event, 'signup')">
+              <div class="form-group">
+                <label for="signup-username">Username</label>
+                <input
+                  id="signup-username"
+                  type="text"
+                  placeholder="Choose a username"
+                  autocomplete="username"
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-email">Email</label>
+                <input
+                  id="signup-email"
+                  type="email"
+                  placeholder="you@university.edu"
+                  autocomplete="email"
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-password">Password</label>
+                <input
+                  id="signup-password"
+                  type="password"
+                  placeholder="Create a password"
+                  autocomplete="new-password"
+                />
+              </div>
+
+              <p
+                id="signup-message"
+                style="margin-bottom: 10px; display: none; font-size: 14px"
+              ></p>
+              <button type="submit" class="submit-btn">
+                <svg
+                  class="btn-icon"
+                  width="16"
+                  height="16"
+                  viewBox="0 0 16 16"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M9.9989 1.99979H12.6653C13.0189 1.99979 13.358 2.14025 13.608 2.39027C13.858 2.64029 13.9985 2.97939 13.9985 3.33298V12.6653C13.9985 13.0189 13.858 13.358 13.608 13.608C13.358 13.858 13.0189 13.9985 12.6653 13.9985H9.9989"
+                    stroke="white"
+                    stroke-width="1.33319"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M6.66595 11.3321L9.99893 7.99914L6.66595 4.66617"
+                    stroke="white"
+                    stroke-width="1.33319"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M9.99892 7.99915H1.99979"
+                    stroke="white"
+                    stroke-width="1.33319"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <span>Create Account</span>
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="card-footer">
+          <p>
+            Take control of your finances and live your best college life 🎓
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+      import {
+        getAuth,
+        createUserWithEmailAndPassword,
+        signInWithEmailAndPassword,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+      import {
+        getFirestore,
+        doc,
+        setDoc,
+        getDoc,
+      } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyBaqKm60VgJ2dheoVQMuTnjJTPSODlOLQY",
+        authDomain: "budgetbuddy-71228.firebaseapp.com",
+        projectId: "budgetbuddy-71228",
+        storageBucket: "budgetbuddy-71228.firebasestorage.app",
+        messagingSenderId: "640538173959",
+        appId: "1:640538173959:web:686bf17585efc685f5c0a2",
+        measurementId: "G-WDNG5KGEDC",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      window.switchTab = function (tab) {
+        const signinBtn = document.getElementById("tab-signin");
+        const signupBtn = document.getElementById("tab-signup");
+        const signinForm = document.getElementById("form-signin");
+        const signupForm = document.getElementById("form-signup");
+
+        if (tab === "signin") {
+          signinBtn.classList.add("active");
+          signupBtn.classList.remove("active");
+          signinForm.style.display = "block";
+          signupForm.style.display = "none";
+        } else {
+          signupBtn.classList.add("active");
+          signinBtn.classList.remove("active");
+          signupForm.style.display = "block";
+          signinForm.style.display = "none";
+        }
+      };
+
+      window.handleSubmit = function (e, type) {
+        console.log("handleSubmit clicked:", type);
+        e.preventDefault();
+
+        if (type === "signin") {
+          const email = document.getElementById("signin-username").value.trim();
+          const password = document.getElementById("signin-password").value;
+
+          signInWithEmailAndPassword(auth, email, password)
+            .then(async (userCredential) => {
+              const user = userCredential.user;
+              console.log("Signed in user:", user.uid);
+
+              const docRef = doc(db, "budgets", user.uid);
+              const docSnap = await getDoc(docRef);
+
+              if (docSnap.exists()) {
+                window.location.href = "MainBudget.html";
+              } else {
+                window.location.href = "BudgetSetup.html";
+              }
+            })
+            .catch((error) => {
+              const msg = document.getElementById("signin-message");
+
+              if (error.code === "auth/invalid-credential") {
+                msg.innerText = "Invalid email or password";
+              } else {
+                msg.innerText = "Something went wrong. Try again.";
+              }
+
+              msg.style.color = "red";
+              msg.style.display = "block";
+            });
+        } else {
+          const email = document.getElementById("signup-email").value.trim();
+          const password = document.getElementById("signup-password").value;
+
+          const username = document
+            .getElementById("signup-username")
+            .value.trim();
+
+          console.log("signup values:", { username, email, password });
+
+          createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+              const user = userCredential.user;
+
+              console.log("Auth account created:", user.uid);
+
+              alert("Account created successfully! You can now sign in.");
+              switchTab("signin");
+
+              setDoc(doc(db, "users", user.uid), {
+                username: username,
+                email: email,
+                createdAt: new Date(),
+              })
+                .then(() => {
+                  console.log("User saved in Firestore");
+                })
+                .catch((err) => {
+                  console.log("Firestore failed:", err);
+                });
+            })
+            .catch((error) => {
+              const msg = document.getElementById("signup-message");
+
+              if (error.code === "auth/email-already-in-use") {
+                msg.innerText = "An account with this email already exists.";
+              } else {
+                msg.innerText = "Could not create account. Try again.";
+              }
+
+              msg.style.color = "red";
+              msg.style.display = "block";
+            });
+        }
+        return false;
+      };
+    </script>
+  </body>
+</html>

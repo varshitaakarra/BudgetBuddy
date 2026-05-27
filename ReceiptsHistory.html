@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receipts History</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', -apple-system, Roboto, Helvetica, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #FDF2F8 0%, #FAF5FF 50%, #EFF6FF 100%);
+    }
+
+    /* ── Header ── */
+    header {
+      position: relative;
+      width: 100%;
+      height: 100px;
+      background: linear-gradient(90deg, #FDA5D5 0%, #DAB2FF 50%, #8EC5FF 100%);
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+
+    .deco {
+      position: absolute;
+      inset: 0;
+      opacity: 0.2;
+      pointer-events: none;
+      user-select: none;
+    }
+    .deco span { position: absolute; color: white; line-height: 1; }
+    .deco .d1 { right: 36px; top: 8px;  font-size: 36px; }
+    .deco .d2 { left: 80px;  top: 48px; font-size: 30px; }
+    .deco .d3 { left: 160px; top: 20px; font-size: 24px; }
+
+    .header-inner {
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      padding: 0 7.5rem;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .header-inner { padding: 0 1.5rem; }
+      .deco .d2, .deco .d3 { display: none; }
+    }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.25rem;
+      height: 2rem;
+      border-radius: 0.5rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.10); }
+
+    .header-icon {
+      display: flex;
+      width: 2.5rem;
+      height: 2.5rem;
+      padding-top: 0.5rem;
+      padding-left: 0.5rem;
+      flex-direction: column;
+      align-items: flex-start;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.30);
+      flex-shrink: 0;
+    }
+
+    .header-text { display: flex; flex-direction: column; }
+
+    .header-text h1 {
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 2rem;
+      letter-spacing: 0.07px;
+    }
+
+    .header-text p {
+      color: #F3E8FF;
+      font-weight: 400;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      letter-spacing: -0.15px;
+    }
+
+    /* ── Main ── */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem 5rem;
+    }
+
+    /* ── Empty-state card ── */
+    .card {
+      width: 100%;
+      max-width: 1120px;
+      background: #ffffff;
+      border-radius: 14px;
+      border: 1px solid rgba(0,0,0,0.10);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 1.5rem;
+      gap: 1.5rem;
+      min-height: 373px;
+    }
+
+    .card-text {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      text-align: center;
+    }
+
+    .card-text h2 {
+      color: #0A0A0A;
+      font-weight: 700;
+      font-size: 1.5rem;
+      line-height: 2rem;
+      letter-spacing: 0.07px;
+    }
+
+    .card-text p {
+      color: #717182;
+      font-weight: 400;
+      font-size: 1rem;
+      line-height: 1.5rem;
+      letter-spacing: -0.312px;
+      max-width: 401px;
+    }
+
+    /* ── Upload button ── */
+    .upload-btn {
+      width: 100%;
+      max-width: 1023px;
+      height: 2.25rem;
+      padding: 0 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      border-radius: 0.5rem;
+      background: #030213;
+      color: #ffffff;
+      font-family: inherit;
+      font-weight: 500;
+      font-size: 0.875rem;
+      line-height: 1.25rem;
+      letter-spacing: -0.15px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .upload-btn:hover { background: #1a1a2e; }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="deco">
+      <span class="d1">🌸</span>
+      <span class="d2">🌼</span>
+      <span class="d3">🦋</span>
+    </div>
+
+    <div class="header-inner">
+      <!-- Back button -->
+      <button class="back-btn" onclick="history.back()" aria-label="Go back">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M7.99917 12.6653L3.33301 7.99917L7.99917 3.33301" stroke="white" stroke-width="1.33319" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M12.6653 7.99915H3.33301" stroke="white" stroke-width="1.33319" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <!-- Icon -->
+      <div class="header-icon">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <path d="M3.9989 1.99939V21.9936L5.99832 20.9939L7.99774 21.9936L9.99717 20.9939L11.9966 21.9936L13.996 20.9939L15.9954 21.9936L17.9949 20.9939L19.9943 21.9936V1.99939L17.9949 2.9991L15.9954 1.99939L13.996 2.9991L11.9966 1.99939L9.99717 2.9991L7.99774 1.99939L5.99832 2.9991L3.9989 1.99939Z" stroke="white" stroke-width="1.99942" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M15.9954 7.99768H9.9971C9.46682 7.99768 8.95826 8.20833 8.5833 8.5833C8.20833 8.95826 7.99768 9.46682 7.99768 9.9971C7.99768 10.5274 8.20833 11.0359 8.5833 11.4109C8.95826 11.7859 9.46682 11.9965 9.9971 11.9965H13.9959C14.5262 11.9965 15.0348 12.2072 15.4097 12.5821C15.7847 12.9571 15.9954 13.4657 15.9954 13.9959C15.9954 14.5262 15.7847 15.0348 15.4097 15.4097C15.0348 15.7847 14.5262 15.9954 13.9959 15.9954H7.99768" stroke="white" stroke-width="1.99942" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M11.9966 17.495V6.49817" stroke="white" stroke-width="1.99942" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+      <!-- Title & subtitle -->
+      <div class="header-text">
+        <h1>Receipts History 🧾</h1>
+        <p>View all your saved receipts</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main>
+    <div class="card">
+      <!-- Receipt icon -->
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+        <path d="M10.6655 5.33276V58.6603L15.9983 55.9939L21.331 58.6603L26.6638 55.9939L31.9965 58.6603L37.3293 55.9939L42.6621 58.6603L47.9948 55.9939L53.3276 58.6603V5.33276L47.9948 7.99914L42.6621 5.33276L37.3293 7.99914L31.9965 5.33276L26.6638 7.99914L21.331 5.33276L15.9983 7.99914L10.6655 5.33276Z" stroke="#D1D5DC" stroke-width="5.33275" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M42.6621 21.3311H26.6638C25.2495 21.3311 23.8931 21.8929 22.893 22.893C21.8929 23.8931 21.3311 25.2495 21.3311 26.6638C21.3311 28.0781 21.8929 29.4345 22.893 30.4346C23.8931 31.4347 25.2495 31.9966 26.6638 31.9966H37.3293C38.7437 31.9966 40.1001 32.5584 41.1001 33.5585C42.1002 34.5586 42.6621 35.915 42.6621 37.3293C42.6621 38.7437 42.1002 40.1001 41.1001 41.1001C40.1001 42.1002 38.7437 42.6621 37.3293 42.6621H21.3311" stroke="#D1D5DC" stroke-width="5.33275" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M31.9966 46.6617V17.3315" stroke="#D1D5DC" stroke-width="5.33275" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+
+      <!-- Text -->
+      <div class="card-text">
+        <h2>No Receipts Yet</h2>
+        <p>Start uploading receipts to keep track of your spending</p>
+      </div>
+
+      <!-- CTA -->
+      <button class="upload-btn" onclick="window.location.href='UploadReceipt.html'">
+        Upload First Receipt
+      </button>
+    </div>
+  </main>
+
+</body>
+</html>
