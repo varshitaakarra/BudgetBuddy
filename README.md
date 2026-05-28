@@ -34,6 +34,8 @@ APIs & Tools:
 <img width="1324" height="795" alt="Screenshot 2026-05-27 at 10 47 15 PM" src="https://github.com/user-attachments/assets/5996e675-22b6-4ada-a206-4ccfa7cc5892" /> 
 <img width="1314" height="683" alt="Screenshot 2026-05-27 at 10 47 31 PM" src="https://github.com/user-attachments/assets/92fc59fe-2871-4d13-bb3f-5e9e10df84eb" />
  <img width="419" height="457" alt="Screenshot 2026-05-27 at 10 47 51 PM" src="https://github.com/user-attachments/assets/d028ca17-6ea2-4f01-a7e2-4b62dfba4136" /> 
+ 
+ 
  ## Live Demo
  https://drive.google.com/file/d/1vhm311wo5l7sY6YdMB5IwAxW9FWHtcun/view?usp=sharing 
 
