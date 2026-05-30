@@ -14,8 +14,10 @@ Frontend:
 - HTML
 - CSS
 - JavaScript
+
 Design:
 - Figma
+
 APIs & Tools:
 - OCR API / OCR.js
 - Gemini API
